@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DNA Medicine Research Directory — Feb 2026</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card-bg: #1a1d27;
+    --card-hover: #222636;
+    --accent: #6c63ff;
+    --accent-light: #8b83ff;
+    --text: #e4e4e7;
+    --text-muted: #9ca3af;
+    --border: #2d3148;
+    --tag-bg: #2d3148;
+    --green: #22c55e;
+    --blue: #3b82f6;
+    --orange: #f59e0b;
+    --pink: #ec4899;
+    --cyan: #06b6d4;
+    --red: #ef4444;
+    --purple: #a855f7;
+    --teal: #14b8a6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0;
+  }
+  .header {
+    background: linear-gradient(135deg, #1a1040 0%, #0f1117 50%, #0a1628 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+  }
+  .header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent-light), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+  }
+  .header .subtitle {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .header .stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent-light);
+  }
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .search-container {
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .search-input {
+    width: 100%;
+    padding: 0.85rem 1.2rem 0.85rem 2.8rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 1.1rem;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+  .filter-bar {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+  }
+  .filter-btn {
+    padding: 0.45rem 1rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+  .filter-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .category-section {
+    margin-bottom: 1.5rem;
+  }
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.2rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    user-select: none;
+  }
+  .category-header:hover { background: var(--card-hover); }
+  .category-icon {
+    font-size: 1.5rem;
+    width: 2.2rem;
+    text-align: center;
+  }
+  .category-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    flex: 1;
+  }
+  .category-count {
+    background: var(--tag-bg);
+    padding: 0.2rem 0.7rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .chevron {
+    color: var(--text-muted);
+    transition: transform 0.3s;
+    font-size: 1.2rem;
+  }
+  .category-section.open .chevron { transform: rotate(180deg); }
+  .category-body {
+    display: none;
+    padding: 0.5rem 0 0 0;
+  }
+  .category-section.open .category-body { display: block; }
+  .paper-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.1rem 1.3rem;
+    margin-bottom: 0.6rem;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .paper-card:hover {
+    background: var(--card-hover);
+    border-color: var(--accent);
+  }
+  .paper-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.4rem;
+    color: var(--text);
+  }
+  .paper-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .paper-title a:hover { color: var(--accent-light); }
+  .paper-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+  .paper-abstract {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+  .paper-abstract.expanded {
+    -webkit-line-clamp: unset;
+    overflow: visible;
+  }
+  .expand-btn {
+    background: none;
+    border: none;
+    color: var(--accent-light);
+    font-size: 0.82rem;
+    cursor: pointer;
+    margin-top: 0.3rem;
+    padding: 0;
+  }
+  .expand-btn:hover { text-decoration: underline; }
+  .paper-tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+  }
+  .tag {
+    padding: 0.15rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .tag-arxiv { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .tag-biorxiv { background: rgba(34,197,94,0.15); color: var(--green); }
+  .tag-medrxiv { background: rgba(236,72,153,0.15); color: var(--pink); }
+  .source-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .dot-arxiv { background: var(--blue); }
+  .dot-biorxiv { background: var(--green); }
+  .no-results {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+  }
+  .footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    border-top: 1px solid var(--border);
+    margin-top: 2rem;
+  }
+  .color-gene-editing { border-left: 3px solid var(--blue); }
+  .color-gene-therapy { border-left: 3px solid var(--green); }
+  .color-diagnostics { border-left: 3px solid var(--orange); }
+  .color-nanotech { border-left: 3px solid var(--cyan); }
+  .color-epigenetics { border-left: 3px solid var(--purple); }
+  .color-ai-genomics { border-left: 3px solid var(--pink); }
+  .color-disease { border-left: 3px solid var(--red); }
+  .color-drug-discovery { border-left: 3px solid var(--teal); }
+
+  @media (max-width: 600px) {
+    .header h1 { font-size: 1.5rem; }
+    .header .stats { gap: 1rem; }
+    .container { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>DNA Medicine Research Directory</h1>
+  <div class="subtitle">Tracking New Discoveries from arXiv &amp; bioRxiv — Last 30 Days (Jan 18 – Feb 18, 2026)</div>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">35</div><div class="stat-label">Papers Tracked</div></div>
+    <div class="stat"><div class="stat-num">8</div><div class="stat-label">Categories</div></div>
+    <div class="stat"><div class="stat-num">2</div><div class="stat-label">Sources</div></div>
+  </div>
+  <div class="search-container">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" class="search-input" id="searchInput" placeholder="Search papers by title, author, keyword..." oninput="filterPapers()">
+  </div>
+</div>
+
+<div class="container">
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" data-cat="all" onclick="setFilter('all', this)">All Categories</button>
+    <button class="filter-btn" data-cat="gene-editing" onclick="setFilter('gene-editing', this)">Gene Editing &amp; CRISPR</button>
+    <button class="filter-btn" data-cat="gene-therapy" onclick="setFilter('gene-therapy', this)">Gene Therapy &amp; Delivery</button>
+    <button class="filter-btn" data-cat="diagnostics" onclick="setFilter('diagnostics', this)">Diagnostics &amp; Precision Medicine</button>
+    <button class="filter-btn" data-cat="nanotech" onclick="setFilter('nanotech', this)">DNA Nanotechnology</button>
+    <button class="filter-btn" data-cat="epigenetics" onclick="setFilter('epigenetics', this)">Epigenetics &amp; Gene Regulation</button>
+    <button class="filter-btn" data-cat="ai-genomics" onclick="setFilter('ai-genomics', this)">AI &amp; Computational Genomics</button>
+    <button class="filter-btn" data-cat="disease" onclick="setFilter('disease', this)">Genetic Disease Mechanisms</button>
+    <button class="filter-btn" data-cat="drug-discovery" onclick="setFilter('drug-discovery', this)">Drug Discovery &amp; Pharmacogenomics</button>
+  </div>
+
+  <div id="directoryContent"></div>
+  <div class="no-results" id="noResults" style="display:none;">No papers match your search.</div>
+</div>
+
+<div class="footer">
+  Generated on Feb 18, 2026 &bull; Sources: arXiv, bioRxiv &bull; Papers are preprints and have NOT been peer-reviewed &bull; Updated monthly
+</div>
+
+<script>
+const papers = [
+  // ===== GENE EDITING & CRISPR =====
+  {
+    category: "gene-editing",
+    title: "STRAND: Sequence-Conditioned Transport for Single-Cell Perturbations",
+    authors: "Fu, B.; Dasoulas, G.; Gabbita, S.; Lin, X.; Gao, S.; Su, X.; Ghosh, S.; Zitnik, M.",
+    date: "2026-02-10",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2602.10156",
+    abstract: "A generative model that predicts single-cell transcriptional responses to CRISPR perturbations by conditioning on regulatory DNA sequence. Expands genomic coverage from ~1.5% to ~95% of the genome via zero-shot inference, improving discrimination scores by up to 33% in low-sample regimes across K562, Jurkat, and RPE1 cell lines.",
+    significance: "Breakthrough in predicting CRISPR outcomes at sequence-level resolution, enabling genome-wide perturbation prediction."
+  },
+  {
+    category: "gene-editing",
+    title: "Central Dogma Transformer II: An AI Microscope for Understanding Cellular Regulatory Mechanisms",
+    authors: "Ota, N.",
+    date: "2026-02-09",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2602.08751",
+    abstract: "An interpretable AI model mirroring the central dogma whose attention maps correspond to specific biological relationships: DNA self-attention for genomic relationships, RNA self-attention for gene co-regulation, and DNA-to-RNA cross-attention for transcriptional control. Applied to CRISPRi data, predicts perturbation effects with per-gene mean r=0.84 and recovers the GFI1B regulatory network without supervision.",
+    significance: "New paradigm for mechanism-oriented AI that reveals regulatory structure rather than merely optimizing predictions."
+  },
+  {
+    category: "gene-editing",
+    title: "High-Efficiency Targeted Integration of Extrachromosomal Arrays in C. elegans Using PhiC31 Integrase",
+    authors: "Rich, M.S.; Pellow, R.; Hefel, A.; Rog, O.; Jorgensen, E.M.",
+    date: "2026-01-21",
+    source: "biorxiv",
+    url: "https://doi.org/10.1101/2025.11.11.687718",
+    abstract: "Demonstrates high-efficiency targeted integration of extrachromosomal arrays in C. elegans using PhiC31 integrase, enabling stable, high-expression multi-transgene integration. This overcomes limitations of traditional random integration methods.",
+    significance: "Practical advancement in genome engineering tools for model organism genetics research."
+  },
+
+  // ===== GENE THERAPY & DELIVERY =====
+  {
+    category: "gene-therapy",
+    title: "Exploring the Limits of Pre-Trained Embeddings in Machine-Guided Protein Design: AAV Vector Viability",
+    authors: "Rodrigues, A.F.; Ferraz, L.; Balbi, L.; Cotovio, P.G.; Pesquita, C.",
+    date: "2026-02-16",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2602.14828",
+    abstract: "Systematic evaluation of ProtBERT and ESM2 embedding variants for adeno-associated virus (AAV) capsid engineering. Reveals that amino acid-level embeddings outperform sequence-level before fine-tuning, but task-specific fine-tuning with sequence-level representations yields optimal AAV viability prediction.",
+    significance: "Direct implications for engineering better AAV gene therapy delivery vectors using AI-guided protein design."
+  },
+  {
+    category: "gene-therapy",
+    title: "CHASE: Repurposing Protein Language Models for Latent Flow-Based Fitness Optimization",
+    authors: "Caceres Arroyo, A.; Bogensperger, L.; Allam, A.; Krauthammer, M.; Schindler, K.; Narnhofer, D.",
+    date: "2026-02-02",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2602.02425",
+    abstract: "A framework that repurposes pretrained protein language models to generate high-fitness AAV and GFP protein variants by compressing evolutionary knowledge into a compact latent space with conditional flow-matching. Achieves state-of-the-art on AAV and GFP protein design benchmarks.",
+    significance: "Accelerates gene therapy vector optimization by enabling direct generation of high-fitness capsid variants."
+  },
+  {
+    category: "gene-therapy",
+    title: "Enhanced Muscle Uptake of Chemically Optimized miR-23b Antisense Oligonucleotides for Myotonic Dystrophy Type 1",
+    authors: "Gonzalez-Martinez, I.; Cerro-Herreros, E.; et al.",
+    date: "2026-02-02",
+    source: "biorxiv",
+    url: "https://doi.org/10.1101/2025.07.30.667638",
+    abstract: "Chemically optimized miR-23b antisense oligonucleotides show enhanced muscle uptake as lead therapeutic compounds for myotonic dystrophy type 1 (DM1), a multisystemic disorder caused by CTG repeat expansions in DMPK. These ASOs target sequestered muscleblind proteins to restore normal splicing.",
+    significance: "Promising therapeutic lead for an incurable genetic neuromuscular disease affecting ~1 in 8,000 people."
+  },
+  {
+    category: "gene-therapy",
+    title: "Antisense Oligonucleotide Allele-Specific Targeting of EFEMP1 in Doyne Honeycomb Retinal Dystrophy",
+    authors: "Rezek, F.O.; Sanchez-Pintado, B.; et al.",
+    date: "2026-02-16",
+    source: "biorxiv",
+    url: "https://doi.org/10.1101/2025.07.16.664883",
+    abstract: "Demonstrates allele-specific antisense oligonucleotide targeting of mutant EFEMP1 in a patient-derived model of Doyne honeycomb retinal dystrophy, an autosomal dominant juvenile macular dystrophy that causes visual impairment by early to mid-adulthood.",
+    significance: "First allele-specific therapeutic approach for this inherited retinal disease using patient-derived models."
+  },
+  {
+    category: "gene-therapy",
+    title: "Specificity and Exon Target Space of Splicing Modifying Compounds",
+    authors: "Lenkeit, F.; Knehr, J.; Altorfer, M.; et al.",
+    date: "2026-02-07",
+    source: "biorxiv",
+    url: "https://doi.org/10.1101/2025.08.14.670273",
+    abstract: "Comprehensive characterization of splicing modifying compounds, an established therapeutic strategy with proven clinical applications. Maps the specificity and exon target space to better predict on-target and off-target effects of splicing-based therapeutics.",
+    significance: "Critical resource for the growing field of RNA-targeted medicines and splice-switching therapeutics."
+  },
+
+  // ===== DIAGNOSTICS & PRECISION MEDICINE =====
+  {
+    category: "diagnostics",
+    title: "RareCollab: An Agentic System Diagnosing Mendelian Disorders with Integrated Phenotypic and Molecular Evidence",
+    authors: "Qi, G.; Wang, J.; Chong, M.L.; et al.; Undiagnosed Diseases Network",
+    date: "2026-02-03",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2602.04058",
+    abstract: "An AI diagnostic framework combining genomic data, transcriptomic sequencing (RNA-seq), and phenotype information to prioritize diagnostic variants for rare Mendelian disorders. Achieved 77% top-5 diagnostic accuracy and ~20% improvement over existing approaches on Undiagnosed Diseases Network patients.",
+    significance: "Major advance in ending the 'diagnostic odyssey' for families with undiagnosed rare genetic diseases."
+  },
+  {
+    category: "diagnostics",
+    title: "Fingerprint-Based AI Diagnostic Aid for Kabuki and Wiedemann-Steiner Syndromes",
+    authors: "Lionts, M.; Tomasdottir, A.; Agustsson, V.I.; et al.",
+    date: "2026-02-06",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2602.06282",
+    abstract: "A vision transformer model that uses fingerprint images to distinguish individuals with Kabuki syndrome and Wiedemann-Steiner syndrome from unaffected controls, achieving AUC of 0.85 for KS vs WSS differentiation. Demonstrates that syndrome-specific fingerprint features can enable noninvasive diagnostic screening.",
+    significance: "Novel noninvasive approach to genetic syndrome diagnosis that could expand screening to resource-limited settings."
+  },
+  {
+    category: "diagnostics",
+    title: "Y-Trim: Evidence-Gated Adaptase Tail Trimming for Single-Stranded Bisulfite Sequencing",
+    authors: "Fang, Y.",
+    date: "2026-01-26",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2601.19002",
+    abstract: "An uncertainty-aware preprocessing framework for single-stranded whole-genome bisulfite sequencing (ssWGBS), enabling DNA methylation profiling in low-input and highly fragmented cell-free DNA material. Introduces evidence-gated trimming that improves data quality for liquid biopsy applications.",
+    significance: "Improves the reliability of cell-free DNA methylation analysis, a cornerstone of liquid biopsy diagnostics."
+  },
+  {
+    category: "diagnostics",
+    title: "CYP2D6 Single-Molecule Long-Read Sequencing: A Proof-of-Concept with Hybrid Haplotypes",
+    authors: "Dong, R.; Thamilselvan, M.; Foo, J.C.; et al.",
+    date: "2026-01-21",
+    source: "biorxiv",
+    url: "https://doi.org/10.1101/2022.08.17.503990",
+    abstract: "Proof-of-concept for single-molecule long-read real-time amplicon-based sequencing of CYP2D6, a critical pharmacogene that metabolizes ~20% of medications. Resolves complex hybrid haplotypes that are difficult to characterize with short-read methods.",
+    significance: "Advances pharmacogenomic testing precision for one of the most important drug-metabolizing enzymes."
+  },
+  {
+    category: "diagnostics",
+    title: "Predicting Gene-Disease Associations in Type 2 Diabetes Using ML on Single-Cell RNA-Seq",
+    authors: "Lomboy Toledo, M.D.L.L.; Onah, D.",
+    date: "2026-01-30",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2602.09036",
+    abstract: "Applies machine learning (Extra Trees Classifier and PLS-DA) to single-cell transcriptomic data from mouse pancreatic islets to identify T2D-associated gene expression signatures at single-cell resolution, focusing on beta-cell dysfunction mechanisms.",
+    significance: "Connects single-cell genomics to diabetes gene discovery, advancing precision medicine for metabolic disease."
+  },
+  {
+    category: "diagnostics",
+    title: "Identification of Novel Plasma Proteomic Biomarkers of Dupuytren Disease",
+    authors: "Hummer, B.; Sebastiani, P.J.; Gurinovich, A.; et al.",
+    date: "2026-01-22",
+    source: "biorxiv",
+    url: "https://doi.org/10.1101/2024.12.13.628406",
+    abstract: "Identification of novel plasma proteomic biomarkers for Dupuytren Disease, a chronic progressive disorder causing hand deformities. These biomarkers could enable earlier diagnosis and monitoring of disease progression.",
+    significance: "New blood-based biomarkers for a disease affecting millions, potentially enabling earlier therapeutic intervention."
+  },
+
+  // ===== DNA NANOTECHNOLOGY =====
+  {
+    category: "nanotech",
+    title: "Self-Assembled Rhodium Nanoantennas for Single-Protein UV SERS via DNA Origami",
+    authors: "Zou, Y.; Corduri, N.; D'Amico, F.; et al.",
+    date: "2026-01-19",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2601.13043",
+    abstract: "DNA origami-assembled rhodium nanocube dimer antennas enable single-molecule UV surface-enhanced Raman scattering (SERS) for detecting individual streptavidin proteins. Extends plasmonic biosensing into the UV range, previously inaccessible with gold or silver nanoparticles.",
+    significance: "Opens entirely new spectral ranges for single-molecule protein detection and label-free bio-spectroscopy."
+  },
+  {
+    category: "nanotech",
+    title: "Programming Nonlinear Interfacial Mechanics of Synthetic Cells: Lipid Geometry and DNA Nanostructures",
+    authors: "Masuda, K.; Yanagisawa, M.",
+    date: "2026-01-26",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2601.18174",
+    abstract: "Establishes molecular design principles for programming the mechanical properties of synthetic cells using DNA nanostructures. 3D DNA network architectures markedly reinforce bending resistance, while isolated motifs enhance area stretching, enabling mechanically tunable synthetic cells.",
+    significance: "Foundation for engineering drug-delivery synthetic cells with precisely controlled mechanical properties."
+  },
+
+  // ===== EPIGENETICS & GENE REGULATION =====
+  {
+    category: "epigenetics",
+    title: "Beyond Chromatin Accessibility: Bulk ATAC-seq as an Integrative Assay for Genomes and Epigenomes",
+    authors: "Toumi, I.; Kham, C.; Stuani, L.; Lecam, L.; Roux, P.-F.",
+    date: "2026-02-09",
+    source: "biorxiv",
+    url: "https://doi.org/10.1101/2025.01.18.633115",
+    abstract: "Demonstrates that ATAC-seq, traditionally used only for chromatin accessibility, can serve as an integrative assay for simultaneous genomic and epigenomic characterization, greatly expanding its utility beyond current applications.",
+    significance: "Repurposes a widely-used technique to provide dual genome/epigenome profiling from a single experiment."
+  },
+  {
+    category: "epigenetics",
+    title: "Genome Architecture Shapes Transcriptional Responses to DNA Supercoiling in a Multicellular Organism",
+    authors: "Morao, A.K.; Chervova, A.; Kotte, A.; et al.",
+    date: "2026-01-21",
+    source: "biorxiv",
+    url: "https://doi.org/10.1101/2025.01.03.631213",
+    abstract: "Reveals how DNA supercoiling, an intrinsic consequence of transcription, shapes transcription dynamics in chromatinized animal genomes. Genome architecture determines the pattern and extent of supercoiling-driven gene regulation in multicellular organisms.",
+    significance: "New understanding of a fundamental but underappreciated mechanism of gene regulation with therapeutic implications."
+  },
+  {
+    category: "epigenetics",
+    title: "A Naive piRNA Surveillance System That Broadly Monitors the Germline Transcriptome",
+    authors: "Shoji, K.; Tomari, Y.",
+    date: "2026-02-17",
+    source: "biorxiv",
+    url: "https://doi.org/10.1101/2024.01.24.577019",
+    abstract: "Discovers that PIWI-interacting RNAs (piRNAs) operate a naive surveillance system that broadly monitors the entire germline transcriptome for adaptive genome defense, rather than only targeting known transposable elements.",
+    significance: "Redefines our understanding of how germline cells protect genome integrity against invasive genetic elements."
+  },
+  {
+    category: "epigenetics",
+    title: "Motif Diversity in Human Liver ChIP-seq Data Using MAP-Elites",
+    authors: "Medina, A.; Benton, M.L.",
+    date: "2026-01-25",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2601.17808",
+    abstract: "Applies the MAP-Elites quality-diversity algorithm to discover multiple high-quality DNA motif variants in CTCF ChIP-seq data, revealing structured diversity in transcription factor binding patterns obscured by single-solution approaches.",
+    significance: "New computational approach reveals hidden diversity in DNA regulatory motifs relevant to gene regulation."
+  },
+  {
+    category: "epigenetics",
+    title: "In Vitro Binding Energies Capture Klf4 Occupancy Across the Human Genome",
+    authors: "Schwager, A.; Neipel, J.; Savich, Y.; et al.",
+    date: "2026-01-22",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2601.16151",
+    abstract: "Demonstrates that physical binding energies measured in vitro, combined with an Ising model, can predict transcription factor Klf4 occupancy across the entire human genome without additional fit parameters. This addresses both motif and non-motif binding sequences.",
+    significance: "Bridges the gap between biophysics and genomics for predicting gene regulation from first principles."
+  },
+
+  // ===== AI & COMPUTATIONAL GENOMICS =====
+  {
+    category: "ai-genomics",
+    title: "AntigenLM: Structure-Aware DNA Language Modeling for Influenza",
+    authors: "Pei, Y.; Chi, X.; Kang, Y.",
+    date: "2026-02-09",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2602.09067",
+    abstract: "A generative DNA language model pretrained on influenza genomes with intact functional units. Accurately forecasts future antigenic variants across regions and subtypes, including unseen ones, outperforming phylogenetic and evolution-based models. Disrupting genomic structure severely degrades performance.",
+    significance: "Could enable early prediction of influenza variants for proactive vaccine design and pandemic preparedness."
+  },
+  {
+    category: "ai-genomics",
+    title: "Alignment or Integration? Rethinking Multimodal Fusion in DNA-Language Foundation Models",
+    authors: "Li, Y.; Jin, C.Y.; Jin, Y.; Luo, M.; Xu, T.; Jiao, S.; He, W.; Zhang, Q.",
+    date: "2026-01-21",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2602.12286",
+    abstract: "Proposes two new methods for DNA-language fusion: SeqCLIP (sequence-level contrastive pre-training) and OneVocab (vocabulary-level k-mer integration). Shows that early vocabulary-level integration yields more effective representations for DNA-language modeling than embedding-level alignment.",
+    significance: "Foundational advance in combining DNA understanding with natural language reasoning for genomic AI."
+  },
+  {
+    category: "ai-genomics",
+    title: "Toward Interpretable and Generalizable AI in Regulatory Genomics",
+    authors: "Nagai, M.; Murphy, A.E.; Rizzo, K.; Koo, P.K.",
+    date: "2026-02-01",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2602.01230",
+    abstract: "Comprehensive review examining how sequence-to-function models predict regulatory readouts from DNA sequence, identifying why strong predictive accuracy fails to translate into robust regulatory understanding. Proposes AI-experiment feedback loops for continual model improvement.",
+    significance: "Roadmap for making AI models in regulatory genomics more reliable and biologically meaningful."
+  },
+  {
+    category: "ai-genomics",
+    title: "Robust ML for Regulatory Sequence Modeling Under Distribution Shifts",
+    authors: "Yang, Y.",
+    date: "2026-01-21",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2601.14969",
+    abstract: "Introduces a robustness framework combining mechanistic simulation with real MPRA data to quantify how distribution shifts degrade DNA regulatory sequence predictions. Shows that biological structural priors improve robustness under genomic shifts, while uncertainty-aware prediction offers additional safety.",
+    significance: "Critical for making genomic AI models reliable enough for clinical and therapeutic applications."
+  },
+  {
+    category: "ai-genomics",
+    title: "GenPairX: Hardware-Algorithm Co-Designed Accelerator for Paired-End Read Mapping",
+    authors: "Eudine, J.; Li, C.; Cheng, Z.; et al.",
+    date: "2026-01-27",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2601.19384",
+    abstract: "A hardware-algorithm co-designed accelerator achieving 1575x higher throughput per watt compared to CPU-based read mappers for paired-end DNA sequencing alignment, without compromising accuracy. Uses novel paired filtering and lightweight alignment algorithms.",
+    significance: "Massive speedup for genomic data processing, enabling faster clinical sequencing turnaround."
+  },
+
+  // ===== GENETIC DISEASE MECHANISMS =====
+  {
+    category: "disease",
+    title: "Cholinergic Signaling Modulates Intestinal Pathophysiology in a Drosophila Cystic Fibrosis Model",
+    authors: "Lane, E.; Petsakou, A.; Liu, Y.; Chen, W.; et al.",
+    date: "2026-02-05",
+    source: "biorxiv",
+    url: "https://doi.org/10.1101/2025.07.02.662792",
+    abstract: "Using a Drosophila model, demonstrates that cholinergic signaling modulates intestinal pathophysiology in cystic fibrosis, revealing a new regulatory axis for the disease caused by CFTR mutations. Opens potential new therapeutic targets beyond chloride channel correction.",
+    significance: "Identifies a novel signaling pathway that could complement existing CFTR modulator therapies."
+  },
+  {
+    category: "disease",
+    title: "RAPGEF1 Modulates Risk for Melanoma and Nevi via RAS Activation at 9q34.13",
+    authors: "Thakur, R.; Xu, M.; Thornock, A.M.; et al.; Melanoma Meta-Analysis Consortium",
+    date: "2026-02-09",
+    source: "biorxiv",
+    url: "https://doi.org/10.64898/2025.12.03.691936",
+    abstract: "Functional characterization of the 9q34.13 GWAS locus identifies RAPGEF1 as the causal gene modulating melanoma and nevus count risk through RAS pathway activation. Fine-mapping and melanocyte expression data pinpoint the mechanism.",
+    significance: "Translates a GWAS signal into a druggable mechanism (RAS pathway) for melanoma prevention."
+  },
+  {
+    category: "disease",
+    title: "PARP1 Suppression Drives ROS Resistance in Aneuploid Cancer Cells",
+    authors: "Cheng, P.; Mermerian-Baghdassarian, A.; Wang, Y.; et al.",
+    date: "2026-02-16",
+    source: "biorxiv",
+    url: "https://doi.org/10.1101/2025.08.13.670212",
+    abstract: "Reveals that PARP1 suppression enables aneuploid cancer cells to resist reactive oxygen species (ROS), a key mechanism by which chromosomally unstable tumors survive. Provides a molecular explanation for aneuploidy-driven tumor progression and metastasis.",
+    significance: "Identifies a targetable vulnerability in chromosomally unstable cancers, with implications for PARP inhibitor therapy."
+  },
+  {
+    category: "disease",
+    title: "GT>GC 5' Splice-Site Variants: Intermediate Effects and Challenges in Variant Classification",
+    authors: "Lin, J.-H.; Wu, H.; Tang, X.-Y.; et al.",
+    date: "2026-01-22",
+    source: "biorxiv",
+    url: "https://doi.org/10.1101/2025.10.30.685113",
+    abstract: "Characterizes GT>GC splice-site variants as a model for intermediate functional effects in genetic disease—variants that neither eliminate nor fully maintain normal gene function. Highlights a major gap in current variant classification systems.",
+    significance: "Addresses a critical blind spot in clinical genetics that affects diagnosis for thousands of patients."
+  },
+  {
+    category: "disease",
+    title: "Effect Heterogeneity Reveals Complex Pleiotropic Effects of Rare Coding Variants",
+    authors: "Lu, W.; Chen, S.; Auwerx, C.; et al.",
+    date: "2026-02-07",
+    source: "biorxiv",
+    url: "https://doi.org/10.1101/2024.10.01.614806",
+    abstract: "Reveals pervasive effect heterogeneity among rare coding variants, showing complex pleiotropic effects across diverse human phenotypes. Demonstrates that effect sizes vary substantially within the same gene, challenging one-gene-one-effect assumptions.",
+    significance: "Fundamental insight into how rare genetic variants affect multiple traits differently across individuals."
+  },
+  {
+    category: "disease",
+    title: "Persistent Sheaf Laplacian Analysis of Protein Stability and Solubility Changes Upon Mutation",
+    authors: "Ren, Y.; Wee, J.; Chen, X.; Qian, G.; Wei, G.-W.",
+    date: "2026-01-18",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2601.12219",
+    abstract: "SheafLapNet predicts how genetic mutations affect protein structure, stability, and solubility using topological deep learning (Persistent Sheaf Laplacian). Achieves state-of-the-art across stability and solubility benchmarks with enhanced interpretability.",
+    significance: "Better prediction of mutation effects accelerates understanding of genetic disease mechanisms."
+  },
+
+  // ===== DRUG DISCOVERY & PHARMACOGENOMICS =====
+  {
+    category: "drug-discovery",
+    title: "DiSPA: Differential Substructure-Pathway Attention for Drug Response Prediction",
+    authors: "Han, Y.; Kim, S.; Jeong, E.; Lee, S.; Yun, S.; Lim, S.",
+    date: "2026-01-20",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2601.14346",
+    abstract: "A pharmacogenomic framework that models how chemical substructures interact with cellular pathway states to predict drug response. Enables zero-shot transfer to spatial transcriptomics, revealing region-specific drug sensitivity patterns without retraining.",
+    significance: "Bridges pharmacogenomics and spatial biology for more precise drug response prediction."
+  },
+  {
+    category: "drug-discovery",
+    title: "ELILLM: Empowering LLMs for Structure-Based Drug Design via Exploration-Augmented Latent Inference",
+    authors: "Hu, X.; Li, A.; Xing, Q.; Ji, J.; Tuo, H.; Yang, B.",
+    date: "2026-01-20",
+    source: "arxiv",
+    url: "https://arxiv.org/abs/2601.15333",
+    abstract: "A framework that enhances large language models for structure-based drug design using Bayesian optimization in latent space and knowledge-guided decoding. Generates chemically valid, synthetically reasonable molecules with high binding affinity on the CrossDocked2020 benchmark.",
+    significance: "Combines the power of LLMs with protein structure understanding for accelerated drug discovery."
+  },
+  {
+    category: "drug-discovery",
+    title: "Small Molecule Agonists of TREM2 Reprogram Microglia and Protect Synapses in Alzheimer's Models",
+    authors: "Nada, H.; Yuan, S.; El gaamouch, F.; Cho, S.; Gabr, M.",
+    date: "2026-01-21",
+    source: "biorxiv",
+    url: "https://doi.org/10.64898/2026.01.19.700278",
+    abstract: "Identifies small molecule agonists of TREM2, a key immune receptor regulating microglial phagocytosis, that reprogram microglia and protect synapses in human Alzheimer's disease models. TREM2 is a genetic risk factor identified through genomic studies.",
+    significance: "Translates a genomic Alzheimer's risk factor into a potential therapeutic intervention."
+  },
+  {
+    category: "drug-discovery",
+    title: "Fragment-Guided New Therapeutic Molecule Discovery and Mapping of Clinically Relevant Interactomes",
+    authors: "Kanapeckaite, A.; Okuyan, S.; Wagg, D.J.; et al.",
+    date: "2026-01-22",
+    source: "biorxiv",
+    url: "https://doi.org/10.1101/2025.07.09.663848",
+    abstract: "A fragment-guided approach to discovering new therapeutic molecules by mapping clinically relevant protein interactomes. Targets key pathological pathways for complex diseases with improved specificity over traditional drug discovery.",
+    significance: "Systematic approach to target discovery that bridges genomic insights with small molecule therapeutics."
+  },
+  {
+    category: "drug-discovery",
+    title: "AmesNet: Task-Conditioned Deep Learning for Ames Mutagenicity Prediction",
+    authors: "Umansky, T.; Woods, V.; Russell, S.M.; Haders, D.",
+    date: "2026-02-11",
+    source: "biorxiv",
+    url: "https://doi.org/10.1101/2025.03.20.644379",
+    abstract: "A deep learning model with enhanced sensitivity and generalization for predicting Ames mutagenicity—a required genotoxicity assessment for all novel small-molecule therapeutics before human trials. Could accelerate early-stage drug safety screening.",
+    significance: "Speeds up DNA damage/mutagenicity testing that is mandatory for all new drug candidates."
+  }
+];
+
+// Category metadata
+const categories = {
+  "gene-editing": { icon: "✂️", title: "Gene Editing & CRISPR Tools", color: "color-gene-editing" },
+  "gene-therapy": { icon: "💉", title: "Gene Therapy & Delivery", color: "color-gene-therapy" },
+  "diagnostics": { icon: "🔬", title: "Diagnostics & Precision Medicine", color: "color-diagnostics" },
+  "nanotech": { icon: "🧬", title: "DNA Nanotechnology & Biosensors", color: "color-nanotech" },
+  "epigenetics": { icon: "🔮", title: "Epigenetics & Gene Regulation", color: "color-epigenetics" },
+  "ai-genomics": { icon: "🤖", title: "AI & Computational Genomics", color: "color-ai-genomics" },
+  "disease": { icon: "🧪", title: "Genetic Disease Mechanisms", color: "color-disease" },
+  "drug-discovery": { icon: "💊", title: "Drug Discovery & Pharmacogenomics", color: "color-drug-discovery" }
+};
+
+let currentFilter = "all";
+let expandedAbstracts = new Set();
+
+function renderDirectory(searchTerm = "") {
+  const container = document.getElementById("directoryContent");
+  const noResults = document.getElementById("noResults");
+  let html = "";
+  let totalVisible = 0;
+  const term = searchTerm.toLowerCase();
+
+  const catOrder = ["gene-editing","gene-therapy","diagnostics","nanotech","epigenetics","ai-genomics","disease","drug-discovery"];
+
+  catOrder.forEach(catKey => {
+    if (currentFilter !== "all" && currentFilter !== catKey) return;
+    const catInfo = categories[catKey];
+    let catPapers = papers.filter(p => p.category === catKey);
+    if (term) {
+      catPapers = catPapers.filter(p =>
+        p.title.toLowerCase().includes(term) ||
+        p.authors.toLowerCase().includes(term) ||
+        p.abstract.toLowerCase().includes(term) ||
+        p.significance.toLowerCase().includes(term)
+      );
+    }
+    if (catPapers.length === 0) return;
+    totalVisible += catPapers.length;
+
+    const isOpen = currentFilter !== "all" || term || catPapers.length <= 6;
+    html += `<div class="category-section ${isOpen ? 'open' : ''}" data-cat="${catKey}">
+      <div class="category-header" onclick="toggleCategory(this)">
+        <span class="category-icon">${catInfo.icon}</span>
+        <span class="category-title">${catInfo.title}</span>
+        <span class="category-count">${catPapers.length} paper${catPapers.length > 1 ? 's' : ''}</span>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="category-body">`;
+
+    catPapers.sort((a, b) => new Date(b.date) - new Date(a.date));
+    catPapers.forEach((p, idx) => {
+      const pid = catKey + "-" + idx;
+      const isExpanded = expandedAbstracts.has(pid);
+      html += `<div class="paper-card ${catInfo.color}">
+        <div class="paper-title"><a href="${p.url}" target="_blank" rel="noopener">${highlightTerm(p.title, term)}</a></div>
+        <div class="paper-meta">
+          <span><span class="source-dot dot-${p.source}"></span> ${p.source}</span>
+          <span>📅 ${p.date}</span>
+          <span>👤 ${highlightTerm(truncateAuthors(p.authors), term)}</span>
+        </div>
+        <div class="paper-abstract ${isExpanded ? 'expanded' : ''}" id="abs-${pid}">${highlightTerm(p.abstract, term)}</div>
+        <button class="expand-btn" onclick="toggleAbstract('${pid}')">${isExpanded ? 'Show less' : 'Read more'}</button>
+        <div style="margin-top:0.4rem;font-size:0.82rem;color:var(--accent-light);">⚡ ${highlightTerm(p.significance, term)}</div>
+        <div class="paper-tags">
+          <span class="tag tag-${p.source}">${p.source}</span>
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  container.innerHTML = html;
+  noResults.style.display = totalVisible === 0 ? "block" : "none";
+}
+
+function truncateAuthors(a) {
+  const parts = a.split(";");
+  if (parts.length <= 3) return a;
+  return parts.slice(0, 3).join(";") + "; et al.";
+}
+
+function highlightTerm(text, term) {
+  if (!term) return text;
+  const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return text.replace(regex, '<mark style="background:rgba(108,99,255,0.3);color:var(--text);border-radius:2px;padding:0 2px;">$1</mark>');
+}
+
+function toggleCategory(el) {
+  el.parentElement.classList.toggle("open");
+}
+
+function toggleAbstract(pid) {
+  const el = document.getElementById("abs-" + pid);
+  if (expandedAbstracts.has(pid)) {
+    expandedAbstracts.delete(pid);
+    el.classList.remove("expanded");
+    el.nextElementSibling.textContent = "Read more";
+  } else {
+    expandedAbstracts.add(pid);
+    el.classList.add("expanded");
+    el.nextElementSibling.textContent = "Show less";
+  }
+}
+
+function setFilter(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderDirectory(document.getElementById("searchInput").value);
+}
+
+function filterPapers() {
+  renderDirectory(document.getElementById("searchInput").value);
+}
+
+// Initial render
+renderDirectory();
+</script>
+</body>
+</html>

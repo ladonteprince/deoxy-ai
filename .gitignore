@@ -1,0 +1,5 @@
+node_modules/
+.env
+db/deoxy.db
+*.log
+.DS_Store

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deoxy.ai — Where DNA Meets Beauty, Health & Longevity</title>
+  <meta name="description" content="The curated directory for DNA-based skincare, nutrigenomics, biological age testing, and precision wellness. Discover products, science, and practitioners at the intersection of your genome and your glow.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.28/build/spline-viewer.js"></script>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <span class="logo-mark">&#9672;</span>
+        <span class="logo-text">deoxy<span class="logo-accent">.ai</span></span>
+      </a>
+      <div class="nav-links">
+        <a href="#directory" class="nav-link">Directory</a>
+        <a href="#categories" class="nav-link">Categories</a>
+        <a href="#research" class="nav-link">Research</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#submit" class="nav-btn">Submit Resource</a>
+      </div>
+      <button class="nav-mobile-toggle" id="mobileToggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section with 3D Spline DNA -->
+  <section class="hero">
+    <div class="hero-canvas-wrap">
+      <spline-viewer url="https://prod.spline.design/WalUYtXxlY3ehj9B/scene.splinecode" loading-anim-type="none"></spline-viewer>
+      <div class="hero-canvas-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">DNA &middot; Beauty &middot; Health &middot; Longevity</div>
+      <h1 class="hero-title">
+        Your DNA holds the blueprint to
+        <span class="hero-gradient-text">how you age, glow & thrive.</span>
+      </h1>
+      <p class="hero-subtitle">
+        The curated directory for DNA-based skincare, nutrigenomics, biological age testing, and precision wellness. Discover the products, science, and practitioners transforming beauty and health from the inside out.
+      </p>
+      <div class="hero-search">
+        <div class="search-box">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search DNA skincare, nutrigenomics, age testing..." id="heroSearch">
+          <button class="search-btn">Explore</button>
+        </div>
+        <div class="search-tags">
+          <span class="tag">DNA Skincare</span>
+          <span class="tag">Biological Age</span>
+          <span class="tag">Nutrigenomics</span>
+          <span class="tag">Epigenetics</span>
+          <span class="tag">Gene Editing</span>
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-number" data-count="70">0</span>
+          <span class="stat-label">Companies</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-number" data-count="40">0</span>
+          <span class="stat-label">Research Papers</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-number" data-count="6">0</span>
+          <span class="stat-label">Categories</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-scroll-indicator">
+      <span>Scroll to explore</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- Categories Grid -->
+  <section class="categories" id="categories">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Browse by Category</span>
+        <h2 class="section-title">Where your genome meets your goals</h2>
+        <p class="section-desc">Explore the ecosystem of DNA-powered beauty, health, and longevity.</p>
+      </div>
+      <div class="categories-grid" id="categoriesGrid">
+        <a href="#" class="category-card category-featured">
+          <div class="category-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/></svg>
+          </div>
+          <h3>DNA Skincare & Beauty</h3>
+          <p>Personalized skincare, haircare, and anti-aging products matched to your genetic profile</p>
+          <span class="category-count">14 companies</span>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+          </div>
+          <h3>Nutrigenomics</h3>
+          <p>DNA-based diet plans, nutrition optimization, and food-gene interactions</p>
+          <span class="category-count">11 companies</span>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+          </div>
+          <h3>Biological Age & Longevity</h3>
+          <p>Epigenetic clocks, biological age testing, and longevity science</p>
+          <span class="category-count">10 companies</span>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L12 22M12 2C8 6 4 8 4 12C4 16 8 18 12 22M12 2C16 6 20 8 20 12C20 16 16 18 12 22"/></svg>
+          </div>
+          <h3>At-Home DNA Kits</h3>
+          <p>Consumer genetic testing kits for health, wellness, and trait insights</p>
+          <span class="category-count">10 companies</span>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <h3>DNA-Based Supplements</h3>
+          <p>Custom vitamin and supplement stacks personalized to your genetics</p>
+          <span class="category-count">11 companies</span>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <h3>Practitioners & Platforms</h3>
+          <p>Genetic counselors, telehealth platforms, and functional medicine practitioners</p>
+          <span class="category-count">12 companies</span>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          </div>
+          <h3>Research & Breakthroughs</h3>
+          <p>Cutting-edge papers from Nature, Cell, and Science on gene editing for beauty and health</p>
+          <span class="category-count">40+ papers</span>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <h3>AI & Precision Wellness</h3>
+          <p>AI-powered genomic personalization, multi-omics, and pharmacogenomics</p>
+          <span class="category-count">Coming soon</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Directory Listings — Real Companies -->
+  <section class="directory" id="directory">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Featured Companies</span>
+        <h2 class="section-title">Leading the precision beauty & wellness revolution</h2>
+        <p class="section-desc">Real companies using your DNA to personalize skincare, nutrition, supplements, and longevity.</p>
+      </div>
+      <div class="directory-grid" id="directoryGrid">
+
+        <!-- Allel -->
+        <article class="listing-card">
+          <div class="listing-header">
+            <div class="listing-logo" style="background: linear-gradient(135deg, #667eea, #764ba2);">AL</div>
+            <div class="listing-meta">
+              <h3>Allel</h3>
+              <span class="listing-org">DNA Skincare &middot; Sweden</span>
+            </div>
+            <span class="listing-badge">Featured</span>
+          </div>
+          <p class="listing-desc">Swedish luxury DNA-matched skincare subscription. Analyzes 16 genetic markers across five drivers of aging &mdash; intrinsic aging, glycation, photoaging, oxidative stress, and inflammation &mdash; then formulates personalized serums and moisturizers.</p>
+          <div class="listing-tags">
+            <span>DNA Skincare</span>
+            <span>Subscription</span>
+            <span>Anti-Aging</span>
+          </div>
+          <div class="listing-footer">
+            <div class="listing-rating">
+              <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+              <span class="rating-count">4.8</span>
+            </div>
+            <a href="https://allel.com" target="_blank" class="listing-link">Visit &rarr;</a>
+          </div>
+        </article>
+
+        <!-- TruDiagnostic -->
+        <article class="listing-card">
+          <div class="listing-header">
+            <div class="listing-logo" style="background: linear-gradient(135deg, #00cec9, #0984e3);">TD</div>
+            <div class="listing-meta">
+              <h3>TruDiagnostic</h3>
+              <span class="listing-org">Biological Age Testing</span>
+            </div>
+            <span class="listing-badge">Featured</span>
+          </div>
+          <p class="listing-desc">Measures 1M+ DNA methylation locations via the TruAge test, developed with Harvard, Yale, and Duke. Provides 30+ page reports on biological aging factors. The gold standard in epigenetic age testing.</p>
+          <div class="listing-tags">
+            <span>Epigenetic Clock</span>
+            <span>Biological Age</span>
+            <span>Longevity</span>
+          </div>
+          <div class="listing-footer">
+            <div class="listing-rating">
+              <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+              <span class="rating-count">4.9</span>
+            </div>
+            <a href="https://www.trudiagnostic.com" target="_blank" class="listing-link">Visit &rarr;</a>
+          </div>
+        </article>
+
+        <!-- GenoPalate -->
+        <article class="listing-card">
+          <div class="listing-header">
+            <div class="listing-logo" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">GP</div>
+            <div class="listing-meta">
+              <h3>GenoPalate</h3>
+              <span class="listing-org">Nutrigenomics</span>
+            </div>
+          </div>
+          <p class="listing-desc">Analyzes genetic variants related to nutrient digestion and designs personalized meal plans and food recommendations. Also offers DNA-based personalized vitamins tailored to your metabolism.</p>
+          <div class="listing-tags">
+            <span>DNA Nutrition</span>
+            <span>Meal Plans</span>
+            <span>Vitamins</span>
+          </div>
+          <div class="listing-footer">
+            <div class="listing-rating">
+              <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span>
+              <span class="rating-count">4.5</span>
+            </div>
+            <a href="https://www.genopalate.com" target="_blank" class="listing-link">Visit &rarr;</a>
+          </div>
+        </article>
+
+        <!-- Rootine -->
+        <article class="listing-card">
+          <div class="listing-header">
+            <div class="listing-logo" style="background: linear-gradient(135deg, #f093fb, #f5576c);">RT</div>
+            <div class="listing-meta">
+              <h3>Rootine</h3>
+              <span class="listing-org">DNA Supplements</span>
+            </div>
+            <span class="listing-badge badge-new">Popular</span>
+          </div>
+          <p class="listing-desc">Tests 52 scientifically validated genes, combines DNA + blood nutrient levels + lifestyle data to create custom vitamin packs. Proprietary slow-release microbead delivery for 10+ hours of absorption.</p>
+          <div class="listing-tags">
+            <span>Custom Vitamins</span>
+            <span>DNA + Blood</span>
+            <span>Subscription</span>
+          </div>
+          <div class="listing-footer">
+            <div class="listing-rating">
+              <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+              <span class="rating-count">4.7</span>
+            </div>
+            <a href="https://rootine.co" target="_blank" class="listing-link">Visit &rarr;</a>
+          </div>
+        </article>
+
+        <!-- Tally Health -->
+        <article class="listing-card">
+          <div class="listing-header">
+            <div class="listing-logo" style="background: linear-gradient(135deg, #a29bfe, #6c5ce7);">TH</div>
+            <div class="listing-meta">
+              <h3>Tally Health</h3>
+              <span class="listing-org">Longevity &middot; David Sinclair</span>
+            </div>
+            <span class="listing-badge badge-new">New</span>
+          </div>
+          <p class="listing-desc">Co-founded by Harvard longevity researcher David Sinclair. Proprietary TallyAge epigenetic clock analyzes ~850,000 DNA methylation sites. Personalized diet, fitness, sleep, and mental health recommendations.</p>
+          <div class="listing-tags">
+            <span>Epigenetic Age</span>
+            <span>Longevity</span>
+            <span>Harvard</span>
+          </div>
+          <div class="listing-footer">
+            <div class="listing-rating">
+              <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+              <span class="rating-count">4.8</span>
+            </div>
+            <a href="https://tallyhealth.com" target="_blank" class="listing-link">Visit &rarr;</a>
+          </div>
+        </article>
+
+        <!-- EpigenCare -->
+        <article class="listing-card">
+          <div class="listing-header">
+            <div class="listing-logo" style="background: linear-gradient(135deg, #fd79a8, #e84393);">EC</div>
+            <div class="listing-meta">
+              <h3>EpigenCare</h3>
+              <span class="listing-org">Epigenetic Skincare</span>
+            </div>
+          </div>
+          <p class="listing-desc">Offers SKINTELLI &mdash; an epigenetic skin test evaluating skin quality through epigenetic markers (not just DNA sequence) for personalized skincare recommendations. Backed by J&J Innovation.</p>
+          <div class="listing-tags">
+            <span>Epigenetics</span>
+            <span>Skin Test</span>
+            <span>J&J Backed</span>
+          </div>
+          <div class="listing-footer">
+            <div class="listing-rating">
+              <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span>
+              <span class="rating-count">4.4</span>
+            </div>
+            <a href="https://www.epigencare.com" target="_blank" class="listing-link">Visit &rarr;</a>
+          </div>
+        </article>
+
+        <!-- DnaNudge -->
+        <article class="listing-card">
+          <div class="listing-header">
+            <div class="listing-logo" style="background: linear-gradient(135deg, #fdcb6e, #e17055);">DN</div>
+            <div class="listing-meta">
+              <h3>DnaNudge</h3>
+              <span class="listing-org">Nutrigenomics &middot; Imperial College</span>
+            </div>
+          </div>
+          <p class="listing-desc">Wearable wristband loaded with your DNA profile. Scan grocery barcodes while shopping to get instant thumbs-up/thumbs-down on food compatibility with your genetics. Imperial College London spin-out.</p>
+          <div class="listing-tags">
+            <span>Wearable</span>
+            <span>Grocery Scanner</span>
+            <span>Real-Time</span>
+          </div>
+          <div class="listing-footer">
+            <div class="listing-rating">
+              <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span>
+              <span class="rating-count">4.3</span>
+            </div>
+            <a href="https://www.dnanudge.com" target="_blank" class="listing-link">Visit &rarr;</a>
+          </div>
+        </article>
+
+        <!-- Nebula Genomics -->
+        <article class="listing-card">
+          <div class="listing-header">
+            <div class="listing-logo" style="background: linear-gradient(135deg, #0984e3, #6c5ce7);">NB</div>
+            <div class="listing-meta">
+              <h3>Nebula Genomics</h3>
+              <span class="listing-org">Whole Genome Sequencing</span>
+            </div>
+          </div>
+          <p class="listing-desc">Full whole genome sequencing (all 6.4 billion base pairs) with 30x coverage. Comprehensive health, ancestry, and trait reports. Subscription model unlocks new insights as research advances.</p>
+          <div class="listing-tags">
+            <span>WGS</span>
+            <span>Health Reports</span>
+            <span>Privacy-First</span>
+          </div>
+          <div class="listing-footer">
+            <div class="listing-rating">
+              <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+              <span class="rating-count">4.7</span>
+            </div>
+            <a href="https://nebula.org" target="_blank" class="listing-link">Visit &rarr;</a>
+          </div>
+        </article>
+
+        <!-- Genome Medical -->
+        <article class="listing-card">
+          <div class="listing-header">
+            <div class="listing-logo" style="background: linear-gradient(135deg, #55efc4, #00b894);">GM</div>
+            <div class="listing-meta">
+              <h3>Genome Medical</h3>
+              <span class="listing-org">Genetic Counseling</span>
+            </div>
+          </div>
+          <p class="listing-desc">Telehealth genetic counseling with 35+ clinicians available in all 50 US states. Genetic counselors, medical geneticists, and primary care physicians. Appointments within a week via phone or video.</p>
+          <div class="listing-tags">
+            <span>Telehealth</span>
+            <span>Counseling</span>
+            <span>All 50 States</span>
+          </div>
+          <div class="listing-footer">
+            <div class="listing-rating">
+              <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+              <span class="rating-count">4.8</span>
+            </div>
+            <a href="https://www.genomemedical.com" target="_blank" class="listing-link">Visit &rarr;</a>
+          </div>
+        </article>
+
+      </div>
+      <div class="directory-cta">
+        <a href="#" class="btn-outline">View All 70+ Companies &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Research Breakthroughs -->
+  <section class="research" id="research">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Cutting-Edge Research</span>
+        <h2 class="section-title">The science rewriting beauty & health</h2>
+        <p class="section-desc">Breakthrough papers from Nature, Cell, and Science that are shaping the future of DNA-powered wellness.</p>
+      </div>
+      <div class="research-grid" id="researchGrid">
+
+        <article class="research-card">
+          <div class="research-journal">Nature 2023</div>
+          <h3>First Topical Gene Therapy Approved</h3>
+          <p>VYJUVEK: FDA approved the world's first gene therapy that can be painted onto skin. Uses engineered virus to deliver collagen genes. 65% wound closure vs 26% placebo. Opens the door to gene-level skincare.</p>
+          <div class="listing-tags">
+            <span>Gene Therapy</span>
+            <span>Collagen</span>
+            <span>FDA Approved</span>
+          </div>
+        </article>
+
+        <article class="research-card">
+          <div class="research-journal">ESDR 2024</div>
+          <h3>Skin Cell Aging Reversed by 10+ Years</h3>
+          <p>Turn Biotechnologies demonstrated mRNA-based epigenetic reprogramming that reversed aging in human skin cells by up to 10.4 years. First-ever rejuvenation of keratinocytes. Clinical trials planned for 2026.</p>
+          <div class="listing-tags">
+            <span>Epigenetic Reversal</span>
+            <span>mRNA</span>
+            <span>Anti-Aging</span>
+          </div>
+        </article>
+
+        <article class="research-card">
+          <div class="research-journal">Nature 2023</div>
+          <h3>Gray Hair Is Reversible</h3>
+          <p>Melanocyte stem cells get "stuck" in hair follicles &mdash; they don't die. This landmark Nature paper proved gray hair is caused by cell mobility failure, not cell death, opening the door to pigment restoration.</p>
+          <div class="listing-tags">
+            <span>Hair Science</span>
+            <span>Melanocytes</span>
+            <span>Reversible</span>
+          </div>
+        </article>
+
+        <article class="research-card">
+          <div class="research-journal">NEJM Evidence 2025</div>
+          <h3>First Telomere-Lengthening Gene Therapy in Humans</h3>
+          <p>EXG-34217 used AAV to deliver the ZSCAN4 gene, successfully lengthening telomeres in two patients over 24 months. First clinical proof that gene therapy can reverse telomere aging in humans.</p>
+          <div class="listing-tags">
+            <span>Telomeres</span>
+            <span>Gene Therapy</span>
+            <span>Longevity</span>
+          </div>
+        </article>
+
+        <article class="research-card">
+          <div class="research-journal">Obesity (Wiley) 2025</div>
+          <h3>Your DNA Predicts Ozempic Response</h3>
+          <p>GLP1R gene variant rs6923761 predicts weight loss on semaglutide. AA genotype lost weight at 1.64%/month vs 1.04% for G-carriers. Pharmacogenomics could save months of trial-and-error with GLP-1 drugs.</p>
+          <div class="listing-tags">
+            <span>Pharmacogenomics</span>
+            <span>GLP-1</span>
+            <span>Weight Loss</span>
+          </div>
+        </article>
+
+        <article class="research-card">
+          <div class="research-journal">Aging 2025</div>
+          <h3>Epigenetic Diet Reverses Age by 2+ Years</h3>
+          <p>Specific dietary patterns rich in green tea, turmeric, rosemary, and berries were associated with a 2.04-year reduction in epigenetic age. You can literally eat your way to younger DNA methylation patterns.</p>
+          <div class="listing-tags">
+            <span>Epigenetic Diet</span>
+            <span>Methylation</span>
+            <span>Nutrition</span>
+          </div>
+        </article>
+
+        <article class="research-card">
+          <div class="research-journal">Nature Comms 2024</div>
+          <h3>CRISPR Converts White Fat to Brown Fat</h3>
+          <p>CRISPR-engineered human fat cells (HUMBLE) convert calorie-storing white fat into calorie-burning brown fat. Mice gained significantly less weight with 35% improved glucose tolerance. A pill version is in development.</p>
+          <div class="listing-tags">
+            <span>CRISPR</span>
+            <span>Metabolism</span>
+            <span>Obesity</span>
+          </div>
+        </article>
+
+        <article class="research-card">
+          <div class="research-journal">MD Anderson 2025</div>
+          <h3>TAC: A Pill That Reactivates Telomerase</h3>
+          <p>TAC (TERT Activating Compound) epigenetically de-represses the body's own telomerase gene. In aged preclinical models, 6 months of treatment led to new neuron formation and improved cognitive performance. Pill form.</p>
+          <div class="listing-tags">
+            <span>Small Molecule</span>
+            <span>Telomerase</span>
+            <span>Oral</span>
+          </div>
+        </article>
+
+        <article class="research-card">
+          <div class="research-journal">Cell Press 2024</div>
+          <h3>mRNA Restores Elastin Production in Skin</h3>
+          <p>Synthetic mRNA encoding tropoelastin triggered de novo elastin synthesis in human skin cells &mdash; the first demonstration of mRNA-mediated elastin production. Adults stop making elastin; this restarts it.</p>
+          <div class="listing-tags">
+            <span>mRNA</span>
+            <span>Elastin</span>
+            <span>Skin Science</span>
+          </div>
+        </article>
+
+      </div>
+      <div class="directory-cta">
+        <a href="#" class="btn-outline">View All 40+ Research Papers &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter Subscribe — The Helix -->
+  <section class="newsletter" id="newsletter">
+    <div class="container">
+      <div class="newsletter-card">
+        <div class="newsletter-content">
+          <span class="section-tag">The Helix Newsletter</span>
+          <h2>Get the latest DNA + beauty + health breakthroughs in your inbox.</h2>
+          <p>Weekly research summaries, new company launches, and precision wellness insights. No spam, unsubscribe anytime.</p>
+          <form class="subscribe-form" data-source="newsletter-section">
+            <div class="subscribe-input-wrap">
+              <input type="email" placeholder="Enter your email" required>
+              <button type="submit">Subscribe</button>
+            </div>
+            <p class="subscribe-msg"></p>
+          </form>
+        </div>
+        <div class="newsletter-visual">
+          <div class="helix-mini">
+            <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+              <circle cx="60" cy="60" r="50" stroke="url(#grad1)" stroke-width="1" opacity="0.3"/>
+              <circle cx="60" cy="60" r="35" stroke="url(#grad1)" stroke-width="1" opacity="0.5"/>
+              <circle cx="60" cy="60" r="20" fill="url(#grad1)" opacity="0.15"/>
+              <defs><linearGradient id="grad1" x1="0" y1="0" x2="120" y2="120"><stop stop-color="#6c5ce7"/><stop offset="1" stop-color="#00cec9"/></linearGradient></defs>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About / Value Prop -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-content">
+          <span class="section-tag">Why Deoxy.ai</span>
+          <h2 class="section-title">The missing link between<br>your DNA and your routine.</h2>
+          <p>Millions of people have taken DNA tests. Most have no idea what to do with the results. Meanwhile, a new wave of companies are building personalized skincare, nutrition, and longevity products based on your genome.</p>
+          <p><strong>Deoxy.ai</strong> connects the dots. We curate the best DNA-powered products, the latest research, and the practitioners who can help you act on your genetic data &mdash; all in one place.</p>
+          <div class="about-features">
+            <div class="feature">
+              <div class="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+              </div>
+              <div>
+                <h4>Science-Backed Only</h4>
+                <p>Every listing is vetted for real genetic science, not marketing hype</p>
+              </div>
+            </div>
+            <div class="feature">
+              <div class="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div>
+                <h4>Research + Products</h4>
+                <p>See the cutting-edge science alongside the companies commercializing it</p>
+              </div>
+            </div>
+            <div class="feature">
+              <div class="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+              </div>
+              <div>
+                <h4>From Test to Action</h4>
+                <p>Got your DNA results? Find the products, practitioners, and protocols that match</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="about-visual">
+          <div class="helix-graphic">
+            <div class="helix-ring ring-1"></div>
+            <div class="helix-ring ring-2"></div>
+            <div class="helix-ring ring-3"></div>
+            <div class="helix-core"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Submit CTA -->
+  <section class="submit-section" id="submit">
+    <div class="container">
+      <div class="submit-card">
+        <h2>Know a DNA-powered product or breakthrough?</h2>
+        <p>Help others discover the best in precision beauty, nutrigenomics, and longevity science. Submit a company or research paper and our curators will review it within 48 hours.</p>
+        <div class="submit-actions">
+          <a href="#" class="btn-primary">Submit a Resource</a>
+          <a href="#" class="btn-ghost">Become a Curator</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="nav-logo">
+            <span class="logo-mark">&#9672;</span>
+            <span class="logo-text">deoxy<span class="logo-accent">.ai</span></span>
+          </a>
+          <p>Where DNA meets beauty, health, and longevity. The curated directory for precision wellness.</p>
+          <form class="subscribe-form subscribe-form-footer" data-source="footer">
+            <div class="subscribe-input-wrap">
+              <input type="email" placeholder="Your email" required>
+              <button type="submit">Join</button>
+            </div>
+            <p class="subscribe-msg"></p>
+          </form>
+        </div>
+        <div class="footer-col">
+          <h4>Directory</h4>
+          <a href="#">DNA Skincare</a>
+          <a href="#">Nutrigenomics</a>
+          <a href="#">Biological Age</a>
+          <a href="#">DNA Kits</a>
+          <a href="#">Supplements</a>
+        </div>
+        <div class="footer-col">
+          <h4>Science</h4>
+          <a href="#">Latest Research</a>
+          <a href="#">Gene Editing</a>
+          <a href="#">Epigenetics</a>
+          <a href="#">Longevity</a>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <a href="#">About</a>
+          <a href="#">Submit Resource</a>
+          <a href="#">Newsletter</a>
+          <a href="#">Contact</a>
+          <a href="#">Privacy</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Deoxy.ai. All rights reserved.</p>
+        <p class="footer-tagline">Decoding beauty and health, from the inside out.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
