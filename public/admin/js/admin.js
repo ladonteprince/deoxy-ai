@@ -321,6 +321,22 @@ function parseTags(tags) {
 }
 
 /* -----------------------------------------------------------
+   HTML & JS Escaping
+   ----------------------------------------------------------- */
+
+// Escape HTML entities
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// Escape for JS string literals
+function escapeJs(str) {
+  if (!str) return '';
+  return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n');
+}
+
+/* -----------------------------------------------------------
    Simple Markdown Renderer
    ----------------------------------------------------------- */
 
