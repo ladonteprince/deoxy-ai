@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Companies — Deoxy.ai Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <span class="logo-mark">&#9672;</span>
+        <span class="logo-text">deoxy<span class="logo-accent">.ai</span></span>
+        <span class="admin-label">ADMIN</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/admin" class="nav-item"><span class="nav-icon">&#9632;</span> Dashboard</a>
+        <a href="/admin/research" class="nav-item"><span class="nav-icon">&#9830;</span> Research Library</a>
+        <a href="/admin/briefs" class="nav-item"><span class="nav-icon">&#9827;</span> Evidence Briefs</a>
+        <a href="/admin/companies" class="nav-item active"><span class="nav-icon">&#9829;</span> Companies</a>
+        <a href="/admin/pipeline" class="nav-item"><span class="nav-icon">&#9824;</span> Content Pipeline</a>
+        <a href="/admin/subscribers" class="nav-item"><span class="nav-icon">&#9733;</span> Subscribers</a>
+        <a href="/admin/insights" class="nav-item"><span class="nav-icon">&#10024;</span> Insight Generator</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="/" target="_blank" class="sidebar-link">View Site &rarr;</a>
+        <button id="logoutBtn" class="sidebar-link">Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <header class="admin-header">
+        <div>
+          <h1>Companies</h1>
+          <p id="companyCount">Loading companies...</p>
+        </div>
+      </header>
+
+      <!-- Data Table -->
+      <div class="admin-table-wrapper">
+        <table class="admin-table" id="companiesTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Rating</th>
+              <th>Featured</th>
+              <th>Badge</th>
+              <th>Linked Papers</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="companiesBody">
+            <tr><td colspan="7" style="text-align:center; padding:40px; color:var(--text-muted);">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Link Papers Modal -->
+  <div class="admin-modal" id="linkPapersModal">
+    <div class="admin-modal-content" style="max-width:600px;">
+      <div class="admin-modal-header">
+        <h2 id="linkPapersTitle">Link Papers</h2>
+        <button class="admin-btn admin-btn-ghost admin-btn-icon" onclick="closeModal('linkPapersModal')">&times;</button>
+      </div>
+      <div class="admin-modal-body">
+        <div class="admin-form-group">
+          <label>Relationship</label>
+          <select id="linkRelationship" class="admin-select">
+            <option value="supports">Supports</option>
+            <option value="validates">Validates</option>
+            <option value="inspires">Inspires</option>
+          </select>
+        </div>
+        <div class="admin-form-group">
+          <label>Select Research Papers</label>
+          <div id="paperCheckboxList" style="max-height:340px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
+            <p style="color:var(--text-muted); font-size:13px;">Loading papers...</p>
+          </div>
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button class="admin-btn" onclick="closeModal('linkPapersModal')">Cancel</button>
+        <button class="admin-btn admin-btn-primary" id="saveLinkBtn" onclick="savePaperLinks()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expand Row Detail Template (injected via JS) -->
+
+  <script src="/admin/js/admin.js"></script>
+  <script>
+    let companies = [];
+    let allPapers = [];
+    let currentLinkCompanyId = null;
+    let expandedRowId = null;
+
+    // ---- Load Companies ----
+    async function loadCompanies() {
+      try {
+        const data = await api('/companies');
+        companies = Array.isArray(data) ? data : (data.companies || []);
+        document.getElementById('companyCount').textContent = `${companies.length} companies`;
+        renderCompanies();
+      } catch (err) {
+        document.getElementById('companiesBody').innerHTML =
+          '<tr><td colspan="7" style="text-align:center; padding:40px; color:var(--danger);">Failed to load companies.</td></tr>';
+      }
+    }
+
+    // ---- Render Table ----
+    function renderCompanies() {
+      const tbody = document.getElementById('companiesBody');
+      if (companies.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:var(--text-muted);">No companies found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = companies.map(c => {
+        const badgeOptions = ['none', 'featured', 'new', 'popular'];
+        const badgeSelect = badgeOptions.map(b =>
+          `<option value="${b}" ${(c.badge || 'none') === b ? 'selected' : ''}>${b === 'none' ? '—' : b.charAt(0).toUpperCase() + b.slice(1)}</option>`
+        ).join('');
+
+        return `
+          <tr data-id="${c.id}">
+            <td>
+              <button class="table-title" style="background:none; border:none; color:var(--text); font-weight:600; font-size:0.875rem; cursor:pointer; text-align:left; font-family:var(--font); padding:0;"
+                onclick="toggleExpand(${c.id})">${escapeHtml(c.name)}</button>
+            </td>
+            <td><span class="text-muted" style="font-size:0.8125rem;">${escapeHtml(c.category_name || '—')}</span></td>
+            <td>
+              <input type="number" value="${c.rating || 0}" min="0" max="5" step="0.1"
+                style="width:60px; background:var(--bg-card); border:1px solid var(--border); border-radius:6px; padding:6px 8px; color:var(--text); font-family:var(--mono); font-size:0.8125rem; text-align:center;"
+                onblur="updateField(${c.id}, 'rating', parseFloat(this.value))"
+                onkeydown="if(event.key==='Enter'){this.blur()}">
+            </td>
+            <td>
+              <input type="checkbox" ${c.featured ? 'checked' : ''}
+                style="width:16px; height:16px; accent-color:var(--accent); cursor:pointer;"
+                onchange="updateField(${c.id}, 'featured', this.checked ? 1 : 0)">
+            </td>
+            <td>
+              <select style="background:var(--bg-card); border:1px solid var(--border); border-radius:6px; padding:6px 10px; color:var(--text); font-family:var(--font); font-size:0.75rem; cursor:pointer;"
+                onchange="updateField(${c.id}, 'badge', this.value === 'none' ? null : this.value)">
+                ${badgeSelect}
+              </select>
+            </td>
+            <td>
+              <button class="admin-btn admin-btn-sm admin-btn-ghost" onclick="openLinkPapers(${c.id})" style="font-family:var(--mono); font-size:0.8125rem;">
+                ${c.linked_papers || 0} papers
+              </button>
+            </td>
+            <td>
+              <button class="admin-btn admin-btn-sm" onclick="openLinkPapers(${c.id})">Link Papers</button>
+            </td>
+          </tr>
+          <tr class="expand-row" id="expand-${c.id}" style="display:none;">
+            <td colspan="7" style="background:var(--bg-elevated); padding:20px 24px !important;">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; font-size:13px;">
+                <div>
+                  <div style="color:var(--text-muted); text-transform:uppercase; font-size:11px; letter-spacing:0.5px; margin-bottom:4px;">Website</div>
+                  <div style="color:var(--text-secondary);">${c.website ? `<a href="${escapeHtml(c.website)}" target="_blank" style="color:var(--accent-light);">${escapeHtml(c.website)}</a>` : '—'}</div>
+                </div>
+                <div>
+                  <div style="color:var(--text-muted); text-transform:uppercase; font-size:11px; letter-spacing:0.5px; margin-bottom:4px;">Country</div>
+                  <div style="color:var(--text-secondary);">${escapeHtml(c.country || '—')}</div>
+                </div>
+                <div style="grid-column:span 2;">
+                  <div style="color:var(--text-muted); text-transform:uppercase; font-size:11px; letter-spacing:0.5px; margin-bottom:4px;">Description</div>
+                  <div style="color:var(--text-secondary); line-height:1.6;">${escapeHtml(c.description || 'No description.')}</div>
+                </div>
+                <div>
+                  <div style="color:var(--text-muted); text-transform:uppercase; font-size:11px; letter-spacing:0.5px; margin-bottom:4px;">Tags</div>
+                  <div style="color:var(--text-secondary);">${parseTags(c.tags).map(t => `<span style="display:inline-block; background:var(--surface); padding:2px 8px; border-radius:100px; font-size:11px; margin:2px;">${escapeHtml(t)}</span>`).join('') || '—'}</div>
+                </div>
+                <div>
+                  <div style="color:var(--text-muted); text-transform:uppercase; font-size:11px; letter-spacing:0.5px; margin-bottom:4px;">Org Label</div>
+                  <div style="color:var(--text-secondary);">${escapeHtml(c.org_label || '—')}</div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ---- Toggle Expand Row ----
+    function toggleExpand(id) {
+      const row = document.getElementById(`expand-${id}`);
+      if (!row) return;
+
+      if (expandedRowId && expandedRowId !== id) {
+        const prev = document.getElementById(`expand-${expandedRowId}`);
+        if (prev) prev.style.display = 'none';
+      }
+
+      if (row.style.display === 'none') {
+        row.style.display = 'table-row';
+        expandedRowId = id;
+      } else {
+        row.style.display = 'none';
+        expandedRowId = null;
+      }
+    }
+
+    // ---- Inline Update Field ----
+    async function updateField(id, field, value) {
+      try {
+        await api(`/companies/${id}`, {
+          method: 'PUT',
+          body: { [field]: value },
+        });
+        // Update local data
+        const company = companies.find(c => c.id === id);
+        if (company) company[field] = value;
+        showToast(`Updated ${field}.`, 'success');
+      } catch (err) {
+        showToast(`Failed to update ${field}.`, 'error');
+        loadCompanies(); // Reload to reset
+      }
+    }
+
+    // ---- Link Papers ----
+    async function openLinkPapers(companyId) {
+      currentLinkCompanyId = companyId;
+      const company = companies.find(c => c.id === companyId);
+      document.getElementById('linkPapersTitle').textContent = `Link Papers to ${company ? company.name : 'Company'}`;
+
+      // Load papers if not already loaded
+      if (allPapers.length === 0) {
+        try {
+          const data = await api('/research?limit=500');
+          allPapers = data.papers || [];
+        } catch (err) {
+          showToast('Failed to load papers.', 'error');
+          return;
+        }
+      }
+
+      // Load current linked papers for this company
+      let linkedIds = [];
+      try {
+        const companyData = await api(`/companies`);
+        // We need to get linked paper IDs -- use a workaround since there's no dedicated endpoint
+        // The company_papers table stores the relationships
+      } catch (err) {
+        // continue with empty linked IDs
+      }
+
+      // Render checkbox list
+      const container = document.getElementById('paperCheckboxList');
+      container.innerHTML = allPapers.map(p => `
+        <label style="display:flex; align-items:flex-start; gap:10px; padding:10px 12px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); cursor:pointer; transition:var(--transition);"
+          onmouseenter="this.style.borderColor='var(--border-hover)'" onmouseleave="this.style.borderColor='var(--border)'">
+          <input type="checkbox" value="${p.id}" style="margin-top:2px; accent-color:var(--accent); cursor:pointer;">
+          <div>
+            <div style="font-size:13px; font-weight:500; color:var(--text);">${escapeHtml(p.title)}</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${escapeHtml(p.journal || '')} ${p.pub_date ? '(' + fmtDate(p.pub_date) + ')' : ''}</div>
+          </div>
+        </label>
+      `).join('');
+
+      openModal('linkPapersModal');
+    }
+
+    async function savePaperLinks() {
+      if (!currentLinkCompanyId) return;
+
+      const checkboxes = document.querySelectorAll('#paperCheckboxList input[type="checkbox"]:checked');
+      const paperIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+      const relationship = document.getElementById('linkRelationship').value;
+
+      const btn = document.getElementById('saveLinkBtn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      try {
+        await api(`/companies/${currentLinkCompanyId}/papers`, {
+          method: 'POST',
+          body: { paper_ids: paperIds, relationship },
+        });
+        showToast(`Linked ${paperIds.length} paper(s).`, 'success');
+        closeModal('linkPapersModal');
+        loadCompanies(); // Refresh to update linked paper count
+      } catch (err) {
+        showToast('Failed to link papers.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save';
+      }
+    }
+
+    // ---- Helpers ----
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ---- Init ----
+    loadCompanies();
+  </script>
+</body>
+</html>

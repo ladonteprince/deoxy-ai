@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insight Generator — Deoxy.ai Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+  <style>
+    /* ---- Insight Two-Panel Layout ---- */
+    .insight-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 40px;
+      min-height: 480px;
+    }
+
+    .insight-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .insight-panel-header {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ---- Topic Chips ---- */
+    .topic-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .topic-chip {
+      padding: 8px 16px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all var(--transition);
+      font-family: var(--font);
+    }
+    .topic-chip:hover {
+      color: var(--text);
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.1);
+    }
+
+    /* ---- Generate Button ---- */
+    .generate-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 16px 32px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--gradient-primary);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all var(--transition);
+      margin-top: auto;
+    }
+    .generate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--accent-glow);
+    }
+    .generate-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* ---- Shimmer Loading ---- */
+    .insight-shimmer {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .shimmer-line {
+      height: 14px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--surface) 0%, var(--bg-card-hover) 50%, var(--surface) 100%);
+      background-size: 200% 100%;
+      animation: shimmerAnim 1.5s ease-in-out infinite;
+    }
+    .shimmer-line:nth-child(1) { width: 90%; }
+    .shimmer-line:nth-child(2) { width: 100%; }
+    .shimmer-line:nth-child(3) { width: 75%; }
+    .shimmer-line:nth-child(4) { width: 85%; }
+    .shimmer-line:nth-child(5) { width: 60%; }
+    .shimmer-line:nth-child(6) { width: 95%; }
+    .shimmer-line:nth-child(7) { width: 70%; }
+    .shimmer-line:nth-child(8) { width: 80%; }
+
+    @keyframes shimmerAnim {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ---- Empty State ---- */
+    .insight-empty {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9375rem;
+      padding: 40px;
+    }
+
+    /* ---- Cited Research ---- */
+    .cited-section {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .cited-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .cited-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .cited-chip {
+      padding: 6px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      cursor: default;
+      transition: all var(--transition);
+    }
+    .cited-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent-light);
+    }
+
+    /* ---- Action Buttons ---- */
+    .insight-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    /* ---- Saved Insights ---- */
+    .saved-insights-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .saved-insights-header h2 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .saved-insight-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 8px;
+      transition: all var(--transition);
+      overflow: hidden;
+    }
+    .saved-insight-card:hover { border-color: var(--border-hover); }
+
+    .saved-insight-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .saved-insight-header:hover { background: rgba(255, 255, 255, 0.02); }
+
+    .saved-insight-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .saved-insight-topic {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .saved-insight-preview {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .saved-insight-date {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-left: 16px;
+      white-space: nowrap;
+    }
+    .saved-insight-arrow {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-left: 12px;
+      transition: transform var(--transition);
+    }
+    .saved-insight-card.open .saved-insight-arrow { transform: rotate(180deg); }
+
+    .saved-insight-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .saved-insight-card.open .saved-insight-body {
+      max-height: 2000px;
+    }
+    .saved-insight-content {
+      padding: 0 20px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .saved-insight-content .admin-markdown { padding-top: 16px; }
+    .saved-insight-actions {
+      display: flex;
+      gap: 8px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
+    @media (max-width: 1024px) {
+      .insight-panels { grid-template-columns: 1fr; min-height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <span class="logo-mark">&#9672;</span>
+        <span class="logo-text">deoxy<span class="logo-accent">.ai</span></span>
+        <span class="admin-label">ADMIN</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/admin" class="nav-item"><span class="nav-icon">&#9632;</span> Dashboard</a>
+        <a href="/admin/research" class="nav-item"><span class="nav-icon">&#9830;</span> Research Library</a>
+        <a href="/admin/briefs" class="nav-item"><span class="nav-icon">&#9827;</span> Evidence Briefs</a>
+        <a href="/admin/companies" class="nav-item"><span class="nav-icon">&#9829;</span> Companies</a>
+        <a href="/admin/pipeline" class="nav-item"><span class="nav-icon">&#9824;</span> Content Pipeline</a>
+        <a href="/admin/subscribers" class="nav-item"><span class="nav-icon">&#9733;</span> Subscribers</a>
+        <a href="/admin/insights" class="nav-item active"><span class="nav-icon">&#10024;</span> Insight Generator</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="/" target="_blank" class="sidebar-link">View Site &rarr;</a>
+        <button id="logoutBtn" class="sidebar-link">Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <header class="admin-header">
+        <div>
+          <h1>Insight Generator</h1>
+          <p>AI-powered sales intelligence from your research library</p>
+        </div>
+      </header>
+
+      <!-- Two-Panel Layout -->
+      <div class="insight-panels">
+        <!-- Left Panel: Input -->
+        <div class="insight-panel">
+          <div class="insight-panel-header">Ask a Question</div>
+
+          <textarea id="insightTopic" class="admin-textarea" style="min-height:120px; font-size:0.9375rem; line-height:1.6; resize:vertical; margin-bottom:16px;" placeholder="Ask a question or enter a topic..."></textarea>
+
+          <div class="topic-chips" id="topicChips">
+            <button class="topic-chip" data-topic="Why should a 25yo invest in DNA skincare?">Why should a 25yo invest in DNA skincare?</button>
+            <button class="topic-chip" data-topic="The science behind beauty supplements">The science behind beauty supplements</button>
+            <button class="topic-chip" data-topic="How DNA testing disrupts the beauty industry">How DNA testing disrupts the beauty industry</button>
+            <button class="topic-chip" data-topic="Evidence that epigenetic skincare works">Evidence that epigenetic skincare works</button>
+            <button class="topic-chip" data-topic="Why nutrigenomics is the future of beauty">Why nutrigenomics is the future of beauty</button>
+          </div>
+
+          <button class="generate-btn" id="generateInsightBtn" onclick="generateInsight()">
+            Generate Insight
+          </button>
+        </div>
+
+        <!-- Right Panel: Output -->
+        <div class="insight-panel" id="insightOutputPanel">
+          <div class="insight-panel-header">AI Response</div>
+
+          <div id="insightOutput">
+            <div class="insight-empty">
+              <div>
+                <div style="font-size:2rem; margin-bottom:12px; opacity:0.3;">&#10024;</div>
+                <p>Your AI-generated insight will appear here</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saved Insights -->
+      <div>
+        <div class="saved-insights-header">
+          <h2>Saved Insights</h2>
+          <span id="savedCount" style="font-size:0.8125rem; color:var(--text-muted);"></span>
+        </div>
+        <div id="savedInsights">
+          <div style="text-align:center; padding:40px; color:var(--text-muted); font-size:0.875rem;">Loading saved insights...</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/admin/js/admin.js"></script>
+  <script>
+    let savedInsights = [];
+    let allPapers = [];
+    let lastGeneratedResponse = '';
+
+    // ---- Topic Chips ----
+    document.getElementById('topicChips').addEventListener('click', (e) => {
+      const chip = e.target.closest('.topic-chip');
+      if (!chip) return;
+      document.getElementById('insightTopic').value = chip.dataset.topic;
+      document.getElementById('insightTopic').focus();
+    });
+
+    // ---- Generate Insight ----
+    async function generateInsight() {
+      const topic = document.getElementById('insightTopic').value.trim();
+      if (!topic) {
+        showToast('Please enter a topic or question.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('generateInsightBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="admin-loading-spinner" style="width:18px; height:18px; border-width:2px; display:inline-block;"></span> Generating...';
+
+      // Show shimmer loading
+      const output = document.getElementById('insightOutput');
+      output.innerHTML = `
+        <div class="insight-shimmer">
+          <div class="shimmer-line"></div>
+          <div class="shimmer-line"></div>
+          <div class="shimmer-line"></div>
+          <div class="shimmer-line"></div>
+          <div class="shimmer-line"></div>
+          <div class="shimmer-line"></div>
+          <div class="shimmer-line"></div>
+          <div class="shimmer-line"></div>
+        </div>
+      `;
+
+      try {
+        const data = await api('/insights/generate', {
+          method: 'POST',
+          body: { topic },
+        });
+
+        lastGeneratedResponse = data.response || '';
+
+        // Load paper titles for cited IDs
+        if (allPapers.length === 0) {
+          try {
+            const papersData = await api('/research?limit=500');
+            allPapers = papersData.papers || [];
+          } catch (e) { /* continue without paper names */ }
+        }
+
+        const citedIds = data.citedIds || [];
+        const citedPapers = citedIds.map(id => allPapers.find(p => p.id === id)).filter(Boolean);
+
+        // Render the response
+        output.innerHTML = `
+          <div class="admin-markdown" style="flex:1;">${renderMarkdown(data.response)}</div>
+          ${citedPapers.length > 0 ? `
+            <div class="cited-section">
+              <div class="cited-label">Cited Research</div>
+              <div class="cited-chips">
+                ${citedPapers.map(p => `<span class="cited-chip" title="${escapeHtml(p.journal || '')}">${escapeHtml(truncate(p.title, 60))}</span>`).join('')}
+              </div>
+            </div>
+          ` : ''}
+          <div class="insight-actions">
+            <button class="admin-btn admin-btn-sm" onclick="copyText(lastGeneratedResponse)">Copy to Clipboard</button>
+            <button class="admin-btn admin-btn-sm" onclick="exportInsight()">Export as Text</button>
+          </div>
+        `;
+
+        showToast('Insight generated and auto-saved!', 'success');
+        loadSavedInsights(); // Refresh saved list
+      } catch (err) {
+        output.innerHTML = `
+          <div class="insight-empty">
+            <div>
+              <div style="font-size:2rem; margin-bottom:12px; opacity:0.3; color:var(--danger);">!</div>
+              <p style="color:var(--danger);">${escapeHtml(err.message || 'Failed to generate insight.')}</p>
+            </div>
+          </div>
+        `;
+        showToast(err.message || 'Failed to generate insight.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Generate Insight';
+      }
+    }
+
+    // ---- Export as Text ----
+    function exportInsight() {
+      if (!lastGeneratedResponse) {
+        showToast('No insight to export.', 'error');
+        return;
+      }
+      const topic = document.getElementById('insightTopic').value.trim() || 'Insight';
+      const blob = new Blob([`Topic: ${topic}\n\n${lastGeneratedResponse}`], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `deoxy-insight-${topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Insight exported.', 'success');
+    }
+
+    // ---- Load Saved Insights ----
+    async function loadSavedInsights() {
+      try {
+        const data = await api('/insights');
+        savedInsights = Array.isArray(data) ? data : (data.insights || data);
+        document.getElementById('savedCount').textContent = `${savedInsights.length} saved`;
+        renderSavedInsights();
+      } catch (err) {
+        document.getElementById('savedInsights').innerHTML =
+          '<div style="text-align:center; padding:40px; color:var(--danger); font-size:0.875rem;">Failed to load saved insights.</div>';
+      }
+    }
+
+    function renderSavedInsights() {
+      const container = document.getElementById('savedInsights');
+      if (savedInsights.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:40px; color:var(--text-muted); font-size:0.875rem;">
+            No saved insights yet. Generate your first one above.
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = savedInsights.map(ins => `
+        <div class="saved-insight-card" data-id="${ins.id}" id="insight-${ins.id}">
+          <div class="saved-insight-header" onclick="toggleInsight(${ins.id})">
+            <div class="saved-insight-info">
+              <div class="saved-insight-topic">${escapeHtml(ins.topic)}</div>
+              <div class="saved-insight-preview">${escapeHtml(truncate(ins.response, 100))}</div>
+            </div>
+            <span class="saved-insight-date">${fmtDate(ins.created_at)}</span>
+            <span class="saved-insight-arrow">&#9660;</span>
+          </div>
+          <div class="saved-insight-body">
+            <div class="saved-insight-content">
+              <div class="admin-markdown">${renderMarkdown(ins.response)}</div>
+              <div class="saved-insight-actions">
+                <button class="admin-btn admin-btn-sm" onclick="copyText(\`${escapeJs(ins.response)}\`)">Copy</button>
+                <button class="admin-btn admin-btn-sm" onclick="exportSavedInsight(${ins.id})">Export</button>
+                <div style="flex:1;"></div>
+                <button class="admin-btn admin-btn-sm admin-btn-danger" onclick="deleteInsight(${ins.id})">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ---- Toggle Insight Expand ----
+    function toggleInsight(id) {
+      const card = document.getElementById(`insight-${id}`);
+      if (!card) return;
+      card.classList.toggle('open');
+    }
+
+    // ---- Export Saved Insight ----
+    function exportSavedInsight(id) {
+      const ins = savedInsights.find(i => i.id === id);
+      if (!ins) return;
+      const blob = new Blob([`Topic: ${ins.topic}\n\n${ins.response}`], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `deoxy-insight-${ins.topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Insight exported.', 'success');
+    }
+
+    // ---- Delete Insight ----
+    async function deleteInsight(id) {
+      if (!confirm('Delete this saved insight?')) return;
+
+      try {
+        await api(`/insights/${id}`, { method: 'DELETE' });
+        showToast('Insight deleted.', 'success');
+        loadSavedInsights();
+      } catch (err) {
+        showToast('Failed to delete insight.', 'error');
+      }
+    }
+
+    // ---- Helpers ----
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function escapeJs(str) {
+      if (!str) return '';
+      return str.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
+    }
+
+    // ---- Init ----
+    loadSavedInsights();
+  </script>
+</body>
+</html>

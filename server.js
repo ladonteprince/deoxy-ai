@@ -1,9 +1,11 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { getDb } from './db/schema.js';
 import { initDb } from './db/schema.js';
+import { adminRouter, adminPageRouter } from './admin/router.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -183,6 +185,10 @@ app.get('/api/stats', (req, res) => {
   db.close();
   res.json({ companies, papers, categories, subscribers });
 });
+
+// Admin panel
+app.use('/api/admin', adminRouter);
+app.use('/admin', adminPageRouter);
 
 // SPA fallback — serve index.html for non-API routes
 app.get('/{*splat}', (req, res) => {

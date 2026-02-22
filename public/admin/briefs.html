@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evidence Briefs — Deoxy.ai Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <span class="logo-mark">&#9672;</span>
+        <span class="logo-text">deoxy<span class="logo-accent">.ai</span></span>
+        <span class="admin-label">ADMIN</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/admin" class="nav-item"><span class="nav-icon">&#9632;</span> Dashboard</a>
+        <a href="/admin/research" class="nav-item"><span class="nav-icon">&#9830;</span> Research Library</a>
+        <a href="/admin/briefs" class="nav-item active"><span class="nav-icon">&#9827;</span> Evidence Briefs</a>
+        <a href="/admin/companies" class="nav-item"><span class="nav-icon">&#9829;</span> Companies</a>
+        <a href="/admin/pipeline" class="nav-item"><span class="nav-icon">&#9824;</span> Content Pipeline</a>
+        <a href="/admin/subscribers" class="nav-item"><span class="nav-icon">&#9733;</span> Subscribers</a>
+        <a href="/admin/insights" class="nav-item"><span class="nav-icon">&#10024;</span> Insight Generator</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="/" target="_blank" class="sidebar-link">View Site &rarr;</a>
+        <button id="logoutBtn" class="sidebar-link">Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <header class="admin-header">
+        <div>
+          <h1 class="page-title">Evidence Briefs</h1>
+          <p class="page-subtitle" id="briefCount">Loading briefs...</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" id="createBriefBtn">
+            <span class="btn-icon">+</span> Create Brief
+          </button>
+        </div>
+      </header>
+
+      <!-- Briefs Grid -->
+      <div class="briefs-grid" id="briefsGrid">
+        <div class="loading-state">Loading briefs...</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Create Brief Modal -->
+  <div class="modal-overlay" id="createModal">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h2 class="modal-title">Create Evidence Brief</h2>
+        <button class="modal-close" onclick="closeModal('createModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="createForm">
+          <div class="form-group">
+            <label for="briefTitle">Title *</label>
+            <input type="text" id="briefTitle" required placeholder="e.g. DNA-Driven Collagen Supplementation">
+          </div>
+
+          <div class="form-group">
+            <label for="briefDesc">Description</label>
+            <textarea id="briefDesc" rows="3" placeholder="Brief description of the evidence brief scope..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="briefAngle">Selling Angle *</label>
+            <select id="briefAngle" required>
+              <option value="">Select an angle</option>
+              <option value="skincare">Skincare</option>
+              <option value="supplements">Supplements</option>
+              <option value="hair">Hair</option>
+              <option value="nutrition">Nutrition</option>
+              <option value="anti-aging">Anti-Aging</option>
+              <option value="longevity">Longevity</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Link Research Papers</label>
+            <div class="paper-picker" id="paperPicker">
+              <div class="paper-picker-search">
+                <input type="text" id="pickerSearch" placeholder="Filter papers..." class="search-input search-input-sm">
+              </div>
+              <div class="paper-picker-list" id="pickerList">
+                <div class="loading-state">Loading papers...</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" onclick="closeModal('createModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="createSubmitBtn">Create Brief</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Brief Detail Modal -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal modal-xl">
+      <div class="modal-header">
+        <h2 class="modal-title" id="detailTitle"></h2>
+        <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="detailBody">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Papers to Brief Modal -->
+  <div class="modal-overlay" id="addPapersModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Add Papers to Brief</h2>
+        <button class="modal-close" onclick="closeModal('addPapersModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="paper-picker">
+          <div class="paper-picker-search">
+            <input type="text" id="addPickerSearch" placeholder="Filter papers..." class="search-input search-input-sm">
+          </div>
+          <div class="paper-picker-list" id="addPickerList">
+            <div class="loading-state">Loading papers...</div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" onclick="closeModal('addPapersModal')">Cancel</button>
+          <button type="button" class="btn btn-primary" id="savePapersBtn">Save Papers</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin/js/admin.js"></script>
+  <script>
+    let allBriefs = [];
+    let allPapers = [];
+    let currentBriefId = null;
+    let currentBriefPaperIds = [];
+
+    // ---- Load Briefs ----
+    async function loadBriefs() {
+      try {
+        const briefs = await api('/api/admin/briefs');
+        allBriefs = briefs || [];
+        document.getElementById('briefCount').textContent = `${allBriefs.length} briefs`;
+        renderBriefs();
+      } catch (err) {
+        document.getElementById('briefsGrid').innerHTML =
+          '<div class="error-state">Failed to load briefs.</div>';
+      }
+    }
+
+    function renderBriefs() {
+      const grid = document.getElementById('briefsGrid');
+      if (allBriefs.length === 0) {
+        grid.innerHTML = '<div class="empty-state">No evidence briefs yet. Create your first brief to get started.</div>';
+        return;
+      }
+
+      grid.innerHTML = allBriefs.map(b => `
+        <div class="brief-card" onclick="openBriefDetail(${b.id})">
+          <div class="brief-card-header">
+            <h3 class="brief-card-title">${escapeHtml(b.title)}</h3>
+            <span class="badge ${badgeClass(b.selling_angle || '')}">${escapeHtml(b.selling_angle || 'N/A')}</span>
+          </div>
+          ${b.description ? `<p class="brief-card-desc">${escapeHtml(b.description)}</p>` : ''}
+          <div class="brief-card-footer">
+            <span class="brief-card-stat">${b.paper_count || 0} paper${(b.paper_count || 0) !== 1 ? 's' : ''}</span>
+            <span class="badge ${b.status === 'final' ? 'badge-success' : 'badge-draft'}">${escapeHtml(b.status || 'draft')}</span>
+            <span class="text-muted">${fmtDate(b.created_at)}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ---- Load All Papers (for pickers) ----
+    async function loadAllPapers() {
+      try {
+        const data = await api('/api/admin/research?limit=500');
+        allPapers = data.papers || [];
+      } catch (err) {
+        allPapers = [];
+      }
+    }
+
+    function renderPaperPicker(containerId, searchInputId, selectedIds = []) {
+      const container = document.getElementById(containerId);
+      const searchInput = document.getElementById(searchInputId);
+      const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+      let filtered = allPapers;
+      if (query) {
+        filtered = allPapers.filter(p =>
+          p.title.toLowerCase().includes(query) ||
+          (p.journal || '').toLowerCase().includes(query) ||
+          (p.category || '').toLowerCase().includes(query)
+        );
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-state">No papers found.</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(p => `
+        <label class="paper-picker-item ${selectedIds.includes(p.id) ? 'selected' : ''}">
+          <input type="checkbox" value="${p.id}" ${selectedIds.includes(p.id) ? 'checked' : ''}>
+          <div class="picker-item-info">
+            <span class="picker-item-title">${escapeHtml(p.title)}</span>
+            <span class="picker-item-meta">
+              ${p.journal ? escapeHtml(p.journal) : ''} ${p.pub_date ? '&middot; ' + fmtDate(p.pub_date) : ''}
+            </span>
+          </div>
+        </label>
+      `).join('');
+    }
+
+    function getCheckedPaperIds(containerId) {
+      const checkboxes = document.getElementById(containerId).querySelectorAll('input[type="checkbox"]:checked');
+      return Array.from(checkboxes).map(cb => parseInt(cb.value));
+    }
+
+    // ---- Create Brief ----
+    document.getElementById('createBriefBtn').addEventListener('click', async () => {
+      await loadAllPapers();
+      document.getElementById('createForm').reset();
+      renderPaperPicker('pickerList', 'pickerSearch', []);
+      openModal('createModal');
+    });
+
+    // Picker search for create modal
+    document.getElementById('pickerSearch').addEventListener('input', () => {
+      const selectedIds = getCheckedPaperIds('pickerList');
+      renderPaperPicker('pickerList', 'pickerSearch', selectedIds);
+    });
+
+    document.getElementById('createForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const payload = {
+        title: document.getElementById('briefTitle').value.trim(),
+        description: document.getElementById('briefDesc').value.trim(),
+        selling_angle: document.getElementById('briefAngle').value,
+        paper_ids: getCheckedPaperIds('pickerList'),
+      };
+
+      if (!payload.title || !payload.selling_angle) {
+        showToast('Title and selling angle are required.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('createSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Creating...';
+
+      try {
+        const data = await api('/api/admin/briefs', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+        showToast('Brief created!', 'success');
+        closeModal('createModal');
+        loadBriefs();
+      } catch (err) {
+        showToast(err.message || 'Failed to create brief.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Create Brief';
+      }
+    });
+
+    // ---- Brief Detail ----
+    async function openBriefDetail(id) {
+      try {
+        const data = await api(`/api/admin/briefs/${id}`);
+        currentBriefId = id;
+        currentBriefPaperIds = (data.papers || []).map(p => p.id);
+
+        document.getElementById('detailTitle').textContent = data.title;
+        document.getElementById('detailBody').innerHTML = buildDetailHtml(data);
+        openModal('detailModal');
+      } catch (err) {
+        showToast('Failed to load brief.', 'error');
+      }
+    }
+
+    function buildDetailHtml(brief) {
+      const papers = brief.papers || [];
+      const hasGenerated = !!brief.generated_brief;
+      const canGenerate = papers.length >= 2;
+
+      return `
+        <div class="detail-meta">
+          ${brief.selling_angle ? `<span class="badge ${badgeClass(brief.selling_angle)}">${escapeHtml(brief.selling_angle)}</span>` : ''}
+          <span class="badge ${brief.status === 'final' ? 'badge-success' : 'badge-draft'}">${escapeHtml(brief.status || 'draft')}</span>
+          <span class="text-muted">${fmtDate(brief.created_at)}</span>
+        </div>
+
+        ${brief.description ? `<div class="detail-section">
+          <h3>Description</h3>
+          <p>${escapeHtml(brief.description)}</p>
+        </div>` : ''}
+
+        <div class="detail-section">
+          <div class="section-header">
+            <h3>Linked Papers (${papers.length})</h3>
+            <button class="btn btn-sm btn-secondary" onclick="openAddPapers(${brief.id})">Add Papers</button>
+          </div>
+          ${papers.length === 0
+            ? '<p class="text-muted">No papers linked yet.</p>'
+            : `<div class="linked-papers-list">
+                ${papers.map(p => `
+                  <div class="linked-paper-item">
+                    <div class="linked-paper-info">
+                      <span class="linked-paper-title">${escapeHtml(p.title)}</span>
+                      <span class="linked-paper-meta">${p.journal ? escapeHtml(p.journal) : ''} ${p.pub_date ? '&middot; ' + fmtDate(p.pub_date) : ''}</span>
+                    </div>
+                    <button class="btn btn-xs btn-danger" onclick="removePaperFromBrief(${brief.id}, ${p.id})">Remove</button>
+                  </div>
+                `).join('')}
+              </div>`
+          }
+        </div>
+
+        <div class="detail-section">
+          <div class="section-header">
+            <h3>Generated Brief</h3>
+            <div class="section-actions">
+              <button class="btn btn-sm btn-accent" id="generateBriefBtn"
+                onclick="generateBrief(${brief.id})"
+                ${!canGenerate ? 'disabled title="Need at least 2 papers"' : ''}>
+                ${hasGenerated ? 'Regenerate Brief' : 'Generate Evidence Brief'}
+              </button>
+              ${hasGenerated ? `
+                <button class="btn btn-sm btn-secondary" onclick="exportBrief(${brief.id})">Export .md</button>
+                <button class="btn btn-sm btn-ghost" onclick="copyBrief(${brief.id})">Copy</button>
+              ` : ''}
+            </div>
+          </div>
+          ${!canGenerate && !hasGenerated
+            ? '<p class="text-muted">Link at least 2 research papers to generate an evidence brief.</p>'
+            : ''
+          }
+          ${hasGenerated
+            ? `<div class="generated-brief-content" id="briefContent">${renderMarkdown(brief.generated_brief)}</div>`
+            : (!canGenerate ? '' : '<p class="text-muted">Click "Generate Evidence Brief" to create the brief.</p>')
+          }
+        </div>
+
+        <div class="detail-section detail-actions-bar">
+          <button class="btn btn-danger" onclick="deleteBrief(${brief.id})">Delete Brief</button>
+        </div>
+      `;
+    }
+
+    // ---- Generate Brief ----
+    async function generateBrief(id) {
+      const btn = document.getElementById('generateBriefBtn');
+      btn.disabled = true;
+      btn.textContent = 'Generating...';
+
+      try {
+        const data = await api(`/api/admin/briefs/${id}/generate`, { method: 'POST' });
+        showToast('Evidence brief generated!', 'success');
+        await openBriefDetail(id);
+      } catch (err) {
+        showToast(err.message || 'Failed to generate brief.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Generate Evidence Brief';
+      }
+    }
+
+    // ---- Export / Copy Brief ----
+    async function exportBrief(id) {
+      try {
+        const data = await api(`/api/admin/briefs/${id}`);
+        if (!data.generated_brief) {
+          showToast('No generated brief to export.', 'error');
+          return;
+        }
+        const blob = new Blob([data.generated_brief], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${(data.slug || 'brief')}.md`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Brief exported as Markdown.', 'success');
+      } catch (err) {
+        showToast('Failed to export brief.', 'error');
+      }
+    }
+
+    async function copyBrief(id) {
+      try {
+        const data = await api(`/api/admin/briefs/${id}`);
+        if (!data.generated_brief) {
+          showToast('No generated brief to copy.', 'error');
+          return;
+        }
+        await copyText(data.generated_brief);
+      } catch (err) {
+        showToast('Failed to copy brief.', 'error');
+      }
+    }
+
+    // ---- Add Papers Modal ----
+    async function openAddPapers(briefId) {
+      currentBriefId = briefId;
+      await loadAllPapers();
+
+      // Get current paper IDs for this brief
+      try {
+        const data = await api(`/api/admin/briefs/${briefId}`);
+        currentBriefPaperIds = (data.papers || []).map(p => p.id);
+      } catch (err) {
+        currentBriefPaperIds = [];
+      }
+
+      renderPaperPicker('addPickerList', 'addPickerSearch', currentBriefPaperIds);
+      openModal('addPapersModal');
+    }
+
+    document.getElementById('addPickerSearch').addEventListener('input', () => {
+      const selectedIds = getCheckedPaperIds('addPickerList');
+      renderPaperPicker('addPickerList', 'addPickerSearch', selectedIds);
+    });
+
+    document.getElementById('savePapersBtn').addEventListener('click', async () => {
+      const paperIds = getCheckedPaperIds('addPickerList');
+      const btn = document.getElementById('savePapersBtn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      try {
+        await api(`/api/admin/briefs/${currentBriefId}/papers`, {
+          method: 'POST',
+          body: JSON.stringify({ paper_ids: paperIds }),
+        });
+        showToast('Papers updated.', 'success');
+        closeModal('addPapersModal');
+        await openBriefDetail(currentBriefId);
+        loadBriefs();
+      } catch (err) {
+        showToast('Failed to update papers.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Papers';
+      }
+    });
+
+    // ---- Remove Paper from Brief ----
+    async function removePaperFromBrief(briefId, paperId) {
+      const newIds = currentBriefPaperIds.filter(id => id !== paperId);
+      try {
+        await api(`/api/admin/briefs/${briefId}/papers`, {
+          method: 'POST',
+          body: JSON.stringify({ paper_ids: newIds }),
+        });
+        showToast('Paper removed.', 'success');
+        await openBriefDetail(briefId);
+        loadBriefs();
+      } catch (err) {
+        showToast('Failed to remove paper.', 'error');
+      }
+    }
+
+    // ---- Delete Brief ----
+    async function deleteBrief(id) {
+      if (!confirm('Are you sure you want to delete this brief? This action cannot be undone.')) return;
+
+      try {
+        await api(`/api/admin/briefs/${id}`, { method: 'DELETE' });
+        showToast('Brief deleted.', 'success');
+        closeModal('detailModal');
+        loadBriefs();
+      } catch (err) {
+        showToast('Failed to delete brief.', 'error');
+      }
+    }
+
+    // ---- Helpers ----
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ---- Init ----
+    loadBriefs();
+  </script>
+</body>
+</html>

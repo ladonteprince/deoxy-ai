@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Research Library — Deoxy.ai Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <span class="logo-mark">&#9672;</span>
+        <span class="logo-text">deoxy<span class="logo-accent">.ai</span></span>
+        <span class="admin-label">ADMIN</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/admin" class="nav-item"><span class="nav-icon">&#9632;</span> Dashboard</a>
+        <a href="/admin/research" class="nav-item active"><span class="nav-icon">&#9830;</span> Research Library</a>
+        <a href="/admin/briefs" class="nav-item"><span class="nav-icon">&#9827;</span> Evidence Briefs</a>
+        <a href="/admin/companies" class="nav-item"><span class="nav-icon">&#9829;</span> Companies</a>
+        <a href="/admin/pipeline" class="nav-item"><span class="nav-icon">&#9824;</span> Content Pipeline</a>
+        <a href="/admin/subscribers" class="nav-item"><span class="nav-icon">&#9733;</span> Subscribers</a>
+        <a href="/admin/insights" class="nav-item"><span class="nav-icon">&#10024;</span> Insight Generator</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="/" target="_blank" class="sidebar-link">View Site &rarr;</a>
+        <button id="logoutBtn" class="sidebar-link">Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <header class="admin-header">
+        <div>
+          <h1 class="page-title">Research Library</h1>
+          <p class="page-subtitle" id="paperCount">Loading papers...</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" id="addPaperBtn">
+            <span class="btn-icon">+</span> Add Paper
+          </button>
+        </div>
+      </header>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="filter-tabs" id="categoryTabs">
+          <button class="filter-tab active" data-category="">All</button>
+          <button class="filter-tab" data-category="skin">Skin</button>
+          <button class="filter-tab" data-category="beauty">Beauty</button>
+          <button class="filter-tab" data-category="nutrition">Nutrition</button>
+          <button class="filter-tab" data-category="longevity">Longevity</button>
+        </div>
+        <div class="filter-search">
+          <input type="text" id="searchInput" placeholder="Search papers..." class="search-input">
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="data-table-wrapper">
+        <table class="data-table" id="papersTable">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Journal</th>
+              <th>Date</th>
+              <th>Category</th>
+              <th>Featured</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="papersBody">
+            <tr><td colspan="6" class="loading-state">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Paper Detail Modal -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h2 class="modal-title" id="detailTitle"></h2>
+        <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="detailBody">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Paper Modal -->
+  <div class="modal-overlay" id="paperModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="paperModalTitle">Add Paper</h2>
+        <button class="modal-close" onclick="closeModal('paperModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="paperForm">
+          <input type="hidden" id="paperId">
+
+          <div class="form-group">
+            <label for="paperTitle">Title *</label>
+            <input type="text" id="paperTitle" required placeholder="Research paper title">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="paperJournal">Journal</label>
+              <input type="text" id="paperJournal" placeholder="e.g. Nature Genetics">
+            </div>
+            <div class="form-group">
+              <label for="paperDate">Publication Date</label>
+              <input type="date" id="paperDate">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="paperSummary">Summary</label>
+            <textarea id="paperSummary" rows="3" placeholder="Brief summary of findings..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="paperRelevance">Consumer Relevance</label>
+            <textarea id="paperRelevance" rows="2" placeholder="Why this matters for consumers..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="paperCategory">Category</label>
+              <select id="paperCategory">
+                <option value="">Select category</option>
+                <option value="skin">Skin</option>
+                <option value="beauty">Beauty</option>
+                <option value="nutrition">Nutrition</option>
+                <option value="longevity">Longevity</option>
+                <option value="precision-wellness">Precision Wellness</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="paperTags">Tags (comma separated)</label>
+              <input type="text" id="paperTags" placeholder="e.g. collagen, aging, UV">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="paperUrl">Source URL</label>
+            <input type="url" id="paperUrl" placeholder="https://...">
+          </div>
+
+          <div class="form-group form-check">
+            <label class="check-label">
+              <input type="checkbox" id="paperFeatured">
+              <span class="check-mark"></span>
+              Featured paper
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" onclick="closeModal('paperModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="paperSubmitBtn">Save Paper</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin/js/admin.js"></script>
+  <script>
+    let allPapers = [];
+    let currentCategory = '';
+    let searchQuery = '';
+
+    // ---- Load Papers ----
+    async function loadPapers() {
+      try {
+        const params = new URLSearchParams();
+        if (currentCategory) params.set('category', currentCategory);
+        if (searchQuery) params.set('search', searchQuery);
+        params.set('limit', '200');
+
+        const data = await api(`/api/admin/research?${params}`);
+        allPapers = data.papers || [];
+        document.getElementById('paperCount').textContent = `${data.total} papers total`;
+        renderTable();
+      } catch (err) {
+        document.getElementById('papersBody').innerHTML =
+          '<tr><td colspan="6" class="error-state">Failed to load papers.</td></tr>';
+      }
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('papersBody');
+      if (allPapers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No papers found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = allPapers.map(p => `
+        <tr data-id="${p.id}">
+          <td>
+            <button class="link-btn paper-title-btn" onclick="openDetail(${p.id})">${escapeHtml(p.title)}</button>
+          </td>
+          <td>${p.journal ? `<span class="badge badge-journal">${escapeHtml(p.journal)}</span>` : '—'}</td>
+          <td class="text-muted">${fmtDate(p.pub_date)}</td>
+          <td>${p.category ? `<span class="badge ${badgeClass(p.category)}">${escapeHtml(p.category)}</span>` : '—'}</td>
+          <td>
+            <label class="toggle-switch">
+              <input type="checkbox" ${p.featured ? 'checked' : ''} onchange="toggleFeatured(${p.id}, this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+          </td>
+          <td class="actions-cell">
+            <button class="btn btn-sm btn-accent" onclick="generateSellingPoint(${p.id})" title="Generate Selling Point">Selling Point</button>
+            <button class="btn btn-sm btn-secondary" onclick="openEditPaper(${p.id})" title="Edit">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deletePaper(${p.id})" title="Delete">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // ---- Category Tabs ----
+    document.getElementById('categoryTabs').addEventListener('click', (e) => {
+      const tab = e.target.closest('.filter-tab');
+      if (!tab) return;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentCategory = tab.dataset.category;
+      loadPapers();
+    });
+
+    // ---- Search ----
+    let searchTimeout;
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        searchQuery = e.target.value.trim();
+        loadPapers();
+      }, 300);
+    });
+
+    // ---- Toggle Featured ----
+    async function toggleFeatured(id, featured) {
+      try {
+        const paper = allPapers.find(p => p.id === id);
+        if (!paper) return;
+        await api(`/api/admin/research/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify({ ...paper, featured: featured ? 1 : 0, tags: parseTags(paper.tags) }),
+        });
+        showToast('Featured status updated.', 'success');
+      } catch (err) {
+        showToast('Failed to update featured status.', 'error');
+        loadPapers();
+      }
+    }
+
+    // ---- Paper Detail ----
+    async function openDetail(id) {
+      try {
+        const data = await api(`/api/admin/research/${id}`);
+        document.getElementById('detailTitle').textContent = data.title;
+
+        const tags = parseTags(data.tags);
+        const sellingPoints = data.sellingPoints || [];
+
+        document.getElementById('detailBody').innerHTML = `
+          <div class="detail-meta">
+            ${data.journal ? `<span class="badge badge-journal">${escapeHtml(data.journal)}</span>` : ''}
+            ${data.category ? `<span class="badge ${badgeClass(data.category)}">${escapeHtml(data.category)}</span>` : ''}
+            ${data.featured ? '<span class="badge badge-featured">Featured</span>' : ''}
+            <span class="text-muted">${fmtDate(data.pub_date)}</span>
+          </div>
+
+          ${data.summary ? `<div class="detail-section">
+            <h3>Summary</h3>
+            <p>${escapeHtml(data.summary)}</p>
+          </div>` : ''}
+
+          ${data.consumer_relevance ? `<div class="detail-section">
+            <h3>Consumer Relevance</h3>
+            <p>${escapeHtml(data.consumer_relevance)}</p>
+          </div>` : ''}
+
+          ${tags.length ? `<div class="detail-section">
+            <h3>Tags</h3>
+            <div class="tag-list">${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+          </div>` : ''}
+
+          ${data.source_url ? `<div class="detail-section">
+            <a href="${escapeHtml(data.source_url)}" target="_blank" class="btn btn-sm btn-secondary">View Source &rarr;</a>
+          </div>` : ''}
+
+          <div class="detail-section">
+            <div class="section-header">
+              <h3>Selling Points</h3>
+              <button class="btn btn-sm btn-accent" id="genSpBtn" onclick="generateSellingPointInDetail(${data.id})">
+                Generate Selling Point
+              </button>
+            </div>
+            <div id="sellingPointsList">
+              ${sellingPoints.length === 0 ? '<p class="text-muted">No selling points generated yet.</p>' : ''}
+              ${sellingPoints.map(sp => `
+                <div class="selling-point-card">
+                  <p>${escapeHtml(sp.narrative)}</p>
+                  <div class="sp-actions">
+                    <button class="btn btn-xs btn-ghost" onclick="copyText(\`${escapeJs(sp.narrative)}\`)">Copy</button>
+                    <span class="text-muted text-xs">${fmtDate(sp.created_at)}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+
+        openModal('detailModal');
+      } catch (err) {
+        showToast('Failed to load paper details.', 'error');
+      }
+    }
+
+    async function generateSellingPointInDetail(paperId) {
+      const btn = document.getElementById('genSpBtn');
+      btn.disabled = true;
+      btn.textContent = 'Generating...';
+
+      try {
+        const data = await api(`/api/admin/research/${paperId}/selling-point`, { method: 'POST' });
+        showToast('Selling point generated!', 'success');
+        // Re-open detail to refresh
+        await openDetail(paperId);
+      } catch (err) {
+        showToast('Failed to generate selling point.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Generate Selling Point';
+      }
+    }
+
+    async function generateSellingPoint(paperId) {
+      showToast('Generating selling point...', 'info');
+      try {
+        await api(`/api/admin/research/${paperId}/selling-point`, { method: 'POST' });
+        showToast('Selling point generated! Click paper title to view.', 'success');
+      } catch (err) {
+        showToast('Failed to generate selling point.', 'error');
+      }
+    }
+
+    // ---- Add/Edit Paper ----
+    document.getElementById('addPaperBtn').addEventListener('click', () => {
+      document.getElementById('paperModalTitle').textContent = 'Add Paper';
+      document.getElementById('paperForm').reset();
+      document.getElementById('paperId').value = '';
+      openModal('paperModal');
+    });
+
+    function openEditPaper(id) {
+      const paper = allPapers.find(p => p.id === id);
+      if (!paper) return;
+
+      document.getElementById('paperModalTitle').textContent = 'Edit Paper';
+      document.getElementById('paperId').value = paper.id;
+      document.getElementById('paperTitle').value = paper.title || '';
+      document.getElementById('paperJournal').value = paper.journal || '';
+      document.getElementById('paperDate').value = paper.pub_date || '';
+      document.getElementById('paperSummary').value = paper.summary || '';
+      document.getElementById('paperRelevance').value = paper.consumer_relevance || '';
+      document.getElementById('paperCategory').value = paper.category || '';
+      document.getElementById('paperUrl').value = paper.source_url || '';
+      document.getElementById('paperFeatured').checked = !!paper.featured;
+
+      const tags = parseTags(paper.tags);
+      document.getElementById('paperTags').value = tags.join(', ');
+
+      openModal('paperModal');
+    }
+
+    document.getElementById('paperForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('paperId').value;
+      const isEdit = !!id;
+
+      const payload = {
+        title: document.getElementById('paperTitle').value.trim(),
+        journal: document.getElementById('paperJournal').value.trim(),
+        pub_date: document.getElementById('paperDate').value,
+        summary: document.getElementById('paperSummary').value.trim(),
+        consumer_relevance: document.getElementById('paperRelevance').value.trim(),
+        category: document.getElementById('paperCategory').value,
+        source_url: document.getElementById('paperUrl').value.trim(),
+        featured: document.getElementById('paperFeatured').checked ? 1 : 0,
+        tags: document.getElementById('paperTags').value.split(',').map(t => t.trim()).filter(Boolean),
+      };
+
+      if (!payload.title) {
+        showToast('Title is required.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('paperSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      try {
+        if (isEdit) {
+          await api(`/api/admin/research/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(payload),
+          });
+          showToast('Paper updated.', 'success');
+        } else {
+          await api('/api/admin/research', {
+            method: 'POST',
+            body: JSON.stringify(payload),
+          });
+          showToast('Paper added.', 'success');
+        }
+        closeModal('paperModal');
+        loadPapers();
+      } catch (err) {
+        showToast(err.message || 'Failed to save paper.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Paper';
+      }
+    });
+
+    // ---- Delete Paper ----
+    async function deletePaper(id) {
+      if (!confirm('Are you sure you want to delete this paper? This action cannot be undone.')) return;
+
+      try {
+        await api(`/api/admin/research/${id}`, { method: 'DELETE' });
+        showToast('Paper deleted.', 'success');
+        loadPapers();
+      } catch (err) {
+        showToast('Failed to delete paper.', 'error');
+      }
+    }
+
+    // ---- Helpers ----
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function escapeJs(str) {
+      if (!str) return '';
+      return str.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
+    }
+
+    // ---- Init ----
+    loadPapers();
+  </script>
+</body>
+</html>

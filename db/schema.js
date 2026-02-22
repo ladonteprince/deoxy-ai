@@ -81,11 +81,54 @@ export function initDb() {
       updated_at TEXT DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS evidence_briefs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      slug TEXT NOT NULL UNIQUE,
+      description TEXT,
+      selling_angle TEXT,
+      generated_brief TEXT,
+      status TEXT DEFAULT 'draft',
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS evidence_brief_papers (
+      brief_id INTEGER REFERENCES evidence_briefs(id) ON DELETE CASCADE,
+      paper_id INTEGER REFERENCES research_papers(id) ON DELETE CASCADE,
+      sort_order INTEGER DEFAULT 0,
+      PRIMARY KEY (brief_id, paper_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS company_papers (
+      company_id INTEGER REFERENCES companies(id) ON DELETE CASCADE,
+      paper_id INTEGER REFERENCES research_papers(id) ON DELETE CASCADE,
+      relationship TEXT DEFAULT 'supports',
+      PRIMARY KEY (company_id, paper_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS generated_insights (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      topic TEXT NOT NULL,
+      response TEXT NOT NULL,
+      cited_paper_ids TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS selling_points (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      paper_id INTEGER REFERENCES research_papers(id) ON DELETE CASCADE,
+      narrative TEXT NOT NULL,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
     CREATE INDEX IF NOT EXISTS idx_companies_category ON companies(category_id);
     CREATE INDEX IF NOT EXISTS idx_companies_featured ON companies(featured);
     CREATE INDEX IF NOT EXISTS idx_research_category ON research_papers(category);
     CREATE INDEX IF NOT EXISTS idx_research_featured ON research_papers(featured);
     CREATE INDEX IF NOT EXISTS idx_subscribers_email ON subscribers(email);
+    CREATE INDEX IF NOT EXISTS idx_briefs_angle ON evidence_briefs(selling_angle);
+    CREATE INDEX IF NOT EXISTS idx_selling_paper ON selling_points(paper_id);
   `);
 
   db.close();

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscribers — Deoxy.ai Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <span class="logo-mark">&#9672;</span>
+        <span class="logo-text">deoxy<span class="logo-accent">.ai</span></span>
+        <span class="admin-label">ADMIN</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/admin" class="nav-item"><span class="nav-icon">&#9632;</span> Dashboard</a>
+        <a href="/admin/research" class="nav-item"><span class="nav-icon">&#9830;</span> Research Library</a>
+        <a href="/admin/briefs" class="nav-item"><span class="nav-icon">&#9827;</span> Evidence Briefs</a>
+        <a href="/admin/companies" class="nav-item"><span class="nav-icon">&#9829;</span> Companies</a>
+        <a href="/admin/pipeline" class="nav-item"><span class="nav-icon">&#9824;</span> Content Pipeline</a>
+        <a href="/admin/subscribers" class="nav-item active"><span class="nav-icon">&#9733;</span> Subscribers</a>
+        <a href="/admin/insights" class="nav-item"><span class="nav-icon">&#10024;</span> Insight Generator</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="/" target="_blank" class="sidebar-link">View Site &rarr;</a>
+        <button id="logoutBtn" class="sidebar-link">Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <header class="admin-header">
+        <div>
+          <h1>Subscribers</h1>
+          <p id="subCount">Loading subscribers...</p>
+        </div>
+        <div class="admin-header-actions">
+          <button class="admin-btn admin-btn-primary" onclick="exportCSV()">
+            Export CSV
+          </button>
+        </div>
+      </header>
+
+      <!-- Stats Bar -->
+      <div class="admin-stats" id="subStats" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon">&#9733;</div>
+          <div class="admin-stat-number" id="statTotal">—</div>
+          <div class="admin-stat-label">Total Subscribers</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon cyan">&#9650;</div>
+          <div class="admin-stat-number" id="statWeek">—</div>
+          <div class="admin-stat-label">This Week</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon success">&#9650;</div>
+          <div class="admin-stat-number" id="statMonth">—</div>
+          <div class="admin-stat-label">This Month</div>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="admin-table-wrapper">
+        <table class="admin-table" id="subscribersTable">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Source</th>
+              <th>Subscribed</th>
+              <th>Confirmed</th>
+            </tr>
+          </thead>
+          <tbody id="subscribersBody">
+            <tr><td colspan="4" style="text-align:center; padding:40px; color:var(--text-muted);">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script src="/admin/js/admin.js"></script>
+  <script>
+    let subscribers = [];
+
+    // ---- Load Subscribers ----
+    async function loadSubscribers() {
+      try {
+        const data = await api('/subscribers');
+        subscribers = data.subscribers || [];
+        const total = data.total || subscribers.length;
+        document.getElementById('subCount').textContent = `${total} subscriber${total !== 1 ? 's' : ''}`;
+
+        calculateStats();
+        renderTable();
+      } catch (err) {
+        document.getElementById('subscribersBody').innerHTML =
+          '<tr><td colspan="4" style="text-align:center; padding:40px; color:var(--danger);">Failed to load subscribers.</td></tr>';
+      }
+    }
+
+    // ---- Calculate Stats ----
+    function calculateStats() {
+      const now = new Date();
+      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+
+      const total = subscribers.length;
+      const thisWeek = subscribers.filter(s => {
+        const d = new Date(s.subscribed_at);
+        return d >= oneWeekAgo;
+      }).length;
+      const thisMonth = subscribers.filter(s => {
+        const d = new Date(s.subscribed_at);
+        return d >= oneMonthAgo;
+      }).length;
+
+      document.getElementById('statTotal').textContent = total.toLocaleString();
+      document.getElementById('statWeek').textContent = thisWeek.toLocaleString();
+      document.getElementById('statMonth').textContent = thisMonth.toLocaleString();
+    }
+
+    // ---- Render Table ----
+    function renderTable() {
+      const tbody = document.getElementById('subscribersBody');
+      if (subscribers.length === 0) {
+        tbody.innerHTML = `
+          <tr><td colspan="4" style="text-align:center; padding:60px; color:var(--text-muted);">
+            <div style="font-size:2rem; margin-bottom:12px; opacity:0.4;">&#9733;</div>
+            <p>No subscribers yet.</p>
+          </td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = subscribers.map(s => {
+        const sourceLabel = s.source || 'website';
+        const sourceBadge = sourceLabel === 'footer' ? 'admin-badge-wellness'
+          : sourceLabel === 'newsletter-section' ? 'admin-badge-nutrition'
+          : 'admin-badge-default';
+
+        return `
+          <tr>
+            <td>
+              <span class="table-title" style="font-family:var(--mono); font-size:0.8125rem;">${escapeHtml(s.email)}</span>
+            </td>
+            <td>
+              <span class="admin-badge ${sourceBadge}" style="font-size:0.625rem;">${escapeHtml(sourceLabel)}</span>
+            </td>
+            <td class="table-meta">${fmtDate(s.subscribed_at)}</td>
+            <td>
+              ${s.confirmed
+                ? '<span style="color:var(--success); font-weight:600; font-size:0.8125rem;">Yes</span>'
+                : '<span style="color:var(--text-muted); font-size:0.8125rem;">No</span>'
+              }
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ---- Export CSV ----
+    function exportCSV() {
+      // Trigger the server-side CSV export endpoint
+      window.location.href = '/api/admin/subscribers/export';
+      showToast('Downloading CSV...', 'info');
+    }
+
+    // ---- Helpers ----
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ---- Init ----
+    loadSubscribers();
+  </script>
+</body>
+</html>
